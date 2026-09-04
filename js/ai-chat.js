@@ -85,7 +85,6 @@ class WeatherGPTChatClient {
           throw new Error('Fallback to client NLP');
         }
       } catch (backendErr) {
-        // GitHub Pages Client-side Smart NLP Fallback Engine
         data = await this.clientSideWeatherGPTNLP(text, weatherContext);
       }
 
@@ -107,13 +106,15 @@ class WeatherGPTChatClient {
     const q = query.toLowerCase().trim();
     let location = context.locationName || 'Your Location';
     let temp = Math.round(context.temp || 28);
+    let maxTemp = context.maxTemp || Math.round(temp + 4);
+    let minTemp = context.minTemp || Math.round(temp - 4);
     let rainProb = context.rainProb || 15;
     let humidity = context.humidity || 60;
     let windSpeed = context.windSpeed || 12;
 
-    // Detect if a place name was mentioned in query
-    const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry"];
-    const match = q.match(/(?:in|me|at|near|ka|ki|for)\s+([a-z\s]+)/i);
+    // Detect Indian location mentioned in query
+    const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry", "best", "visit", "trip", "going", "to"];
+    const match = q.match(/(?:in|me|at|near|ka|ki|for|to)\s+([a-z\s]+)/i);
     let candidateWord = match ? match[1].trim().split(/\s+/).find(w => w.length >= 3 && !stopWords.includes(w)) : null;
 
     if (!candidateWord) {
@@ -122,16 +123,21 @@ class WeatherGPTChatClient {
 
     if (candidateWord) {
       try {
-        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(candidateWord)}&count=1&language=en&format=json`);
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(candidateWord)}&count=5&language=en&format=json`);
         const geoData = await geoRes.json();
         if (geoData.results && geoData.results[0]) {
-          const place = geoData.results[0];
-          location = `${place.name}, ${place.country}`;
-          const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&timezone=auto`);
+          const indianResult = geoData.results.find(r => r.country === 'India') || geoData.results[0];
+          location = `${indianResult.name}${indianResult.admin1 ? ', ' + indianResult.admin1 : ''}`;
+          
+          const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${indianResult.latitude}&longitude=${indianResult.longitude}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
           const wData = await wRes.json();
           if (wData.current_weather) {
             temp = Math.round(wData.current_weather.temperature);
             windSpeed = Math.round(wData.current_weather.windspeed || 12);
+          }
+          if (wData.daily && wData.daily.temperature_2m_max) {
+            maxTemp = Math.round(wData.daily.temperature_2m_max[0]);
+            minTemp = Math.round(wData.daily.temperature_2m_min[0]);
           }
           if (wData.hourly && wData.hourly.precipitation_probability) {
             rainProb = wData.hourly.precipitation_probability[0] || 15;
@@ -147,17 +153,18 @@ class WeatherGPTChatClient {
       ? '☔ Haan, aaj chhata (umbrella) saath rakhein! Baarish hone ki sambhavna hai.'
       : '☀️ Nahin, aaj chhata ki zarurat nahi hai. Mausam saaf rahne ki ummeed hai.';
 
+    let outfitTip = temp > 32 ? '👕 Light cotton clothes pehno, garmi zyada hai.' : temp < 18 ? '🧥 Woolen jacket pehno, thand hai.' : '👕 Comfortable casual clothes pehno.';
     let responseText = '';
     let speechText = '';
 
     if (q.includes('umbrella') || q.includes('chhata') || q.includes('chata')) {
-      responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.`;
+      responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.\n👉 ${outfitTip}`;
       speechText = carryUmbrella ? `${location} me baarish ki sambhavna hai. Chhata saath rakhein.` : `${location} me aaj chhata ki zaroorat nahi hai.`;
-    } else if (q.includes('baarish') || q.includes('rain') || q.includes('kal')) {
-      responseText = `🌧️ **Rain Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Current Temp: **${temp}°C**\n\n${rainProb > 40 ? '⚠️ Rain warning active. Keep umbrella ready.' : '✅ Heavy rainfall alert active nahi hai.'}`;
+    } else if (q.includes('baarish') || q.includes('rain') || q.includes('kal') || q.includes('monsoon')) {
+      responseText = `🌧️ **Rain & Monsoon Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Current Temp: **${temp}°C**\n\n${rainProb > 40 ? '⚠️ Rain warning active. Keep umbrella ready.' : '✅ Heavy rainfall alert active nahi hai.'}`;
       speechText = `${location} me baarish ki sambhavna ${rainProb} percent hai.`;
     } else {
-      responseText = `📍 **${location}** Weather Report:\n\n• 🌡️ **Temperature:** ${temp}°C\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind:** ${windSpeed} km/h\n\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Outside activities ke liye mausam acha hai.'}`;
+      responseText = `📍 **${location}** Weather Report:\n\n• 🌡️ **Temperature:** ${temp}°C (High: ${maxTemp}°C / Low: ${minTemp}°C)\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind:** ${windSpeed} km/h\n\n👉 ${outfitTip}\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Outside activities ke liye mausam acha hai.'}`;
       speechText = `${location} me temperature ${temp} degree celsius hai. Rain probability ${rainProb} percent hai.`;
     }
 
@@ -167,6 +174,8 @@ class WeatherGPTChatClient {
       umbrellaNeeded: carryUmbrella,
       rainProbability: rainProb,
       temperature: temp,
+      maxTemp: maxTemp,
+      minTemp: minTemp,
       location: location,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
