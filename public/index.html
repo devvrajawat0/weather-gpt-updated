@@ -67,10 +67,10 @@
 
     <!-- Right Header Controls -->
     <div class="flex items-center gap-3">
-      <!-- Geolocation Button -->
-      <button id="current-geo-btn" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-sky-400 border border-slate-700/80 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Use My Live GPS Location">
+      <!-- Device GPS Location Button -->
+      <button id="current-geo-btn" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-sky-400 border border-slate-700/80 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Use Device Live Location">
         <i data-lucide="crosshair" class="w-4 h-4"></i>
-        <span class="hidden sm:inline">GPS</span>
+        <span class="hidden sm:inline">My Location</span>
       </button>
 
       <!-- Launch Countdown Badge -->
@@ -84,7 +84,7 @@
     <!-- GLOBAL LOADING SPINNER -->
     <div id="global-spinner" class="hidden fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex flex-col items-center justify-center gap-3">
       <div class="w-12 h-12 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-xs font-semibold tracking-wider text-sky-300 animate-pulse">FETCHING TEHSIL & GLOBAL DATA...</p>
+      <p class="text-xs font-semibold tracking-wider text-sky-300 animate-pulse">FETCHING LIVE WEATHER DATA...</p>
     </div>
 
     <!-- ========================================== -->
@@ -92,23 +92,23 @@
     <!-- ========================================== -->
     <section id="screen-dashboard" class="screen-view space-y-6">
       
-      <!-- Top Search & Quick Tehsil Selector Bar -->
+      <!-- Top Search Bar & Featured Locations Bar -->
       <div class="glass-card p-4 md:p-6 rounded-3xl relative">
         <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
           
           <!-- Search Input with Auto-complete -->
           <div class="relative flex-1">
             <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="text" id="dash-search-input" placeholder="Search Indian Tehsil, District, or World Capital (e.g. Bandra East, Lucknow, Shimla, Tokyo)..." 
+            <input type="text" id="dash-search-input" placeholder="Search any city or location in India or Worldwide (e.g. Mumbai, Lucknow, Shimla, Tokyo, London)..." 
               class="w-full glass-input pl-12 pr-4 py-3.5 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
           </div>
 
           <!-- Featured Location Chips -->
           <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none text-xs">
-            <span class="text-slate-400 font-semibold text-[11px] whitespace-nowrap">Tehsils:</span>
-            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(19.0760, 72.8777, 'Mumbai Tehsil, Maharashtra')">📍 Mumbai</button>
-            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(26.8467, 80.9462, 'Lucknow Tehsil, UP')">📍 Lucknow</button>
-            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(31.1048, 77.1734, 'Shimla Tehsil, HP')">📍 Shimla</button>
+            <span class="text-slate-400 font-semibold text-[11px] whitespace-nowrap">Popular:</span>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(19.0760, 72.8777, 'Mumbai, Maharashtra')">📍 Mumbai</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(26.8467, 80.9462, 'Lucknow, UP')">📍 Lucknow</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(31.1048, 77.1734, 'Shimla, HP')">📍 Shimla</button>
             <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(35.6762, 139.6503, 'Tokyo, Japan')">🌐 Tokyo</button>
           </div>
         </div>
@@ -123,7 +123,7 @@
             <div>
               <div class="flex items-center gap-2 text-sky-400 font-semibold text-xs tracking-wider uppercase mb-1">
                 <i data-lucide="map-pin" class="w-4 h-4"></i>
-                <span id="dash-location-name">New Delhi, India</span>
+                <span id="dash-location-name">Detecting Location...</span>
               </div>
               <h2 id="dash-condition-text" class="text-2xl md:text-3xl font-extrabold text-white">Clear Sky (Saaf Aakash)</h2>
             </div>
@@ -135,7 +135,7 @@
 
           <!-- Main Temperature Display -->
           <div class="my-6">
-            <div id="dash-temp-main" class="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text tracking-tighter">28°C</div>
+            <div id="dash-temp-main" class="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text tracking-tighter">--°C</div>
             <p class="text-xs md:text-sm text-slate-400 mt-1">Live data powered by Open-Meteo High Precision API</p>
           </div>
 
@@ -147,7 +147,7 @@
               </div>
               <div>
                 <div class="text-[10px] text-slate-400 font-semibold uppercase">Humidity</div>
-                <div id="dash-humidity" class="text-sm md:text-base font-bold text-slate-100">62%</div>
+                <div id="dash-humidity" class="text-sm md:text-base font-bold text-slate-100">--%</div>
               </div>
             </div>
 
@@ -157,7 +157,7 @@
               </div>
               <div>
                 <div class="text-[10px] text-slate-400 font-semibold uppercase">Wind</div>
-                <div id="dash-wind" class="text-sm md:text-base font-bold text-slate-100">14 km/h</div>
+                <div id="dash-wind" class="text-sm md:text-base font-bold text-slate-100">-- km/h</div>
               </div>
             </div>
 
@@ -167,7 +167,7 @@
               </div>
               <div>
                 <div class="text-[10px] text-slate-400 font-semibold uppercase">Rain Prob</div>
-                <div id="dash-rain-prob" class="text-sm md:text-base font-bold text-sky-300">15%</div>
+                <div id="dash-rain-prob" class="text-sm md:text-base font-bold text-sky-300">--%</div>
               </div>
             </div>
           </div>
@@ -190,18 +190,18 @@
 
             <!-- Prompt Shortcuts -->
             <div class="space-y-2">
-              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quick Questions:</div>
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ask Location Weather:</div>
               <div class="space-y-2">
-                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Aaj weather kaisa hai?" onclick="window.AppState.switchScreen('chat')">
-                  <span>🌤️ "Aaj weather kaisa hai?"</span>
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Mumbai me weather kaisa hai?" onclick="window.AppState.switchScreen('chat')">
+                  <span>🌊 "Mumbai me weather kaisa hai?"</span>
                   <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
                 </button>
-                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Should I carry an umbrella?" onclick="window.AppState.switchScreen('chat')">
-                  <span>☔ "Should I carry an umbrella?"</span>
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Should I carry an umbrella in Lucknow?" onclick="window.AppState.switchScreen('chat')">
+                  <span>☔ "Should I carry umbrella in Lucknow?"</span>
                   <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
                 </button>
-                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Hindi mein weather batao" onclick="window.AppState.switchScreen('chat')">
-                  <span>🇮🇳 "Hindi mein weather batao"</span>
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Shimla me baraf giregi kya?" onclick="window.AppState.switchScreen('chat')">
+                  <span>❄️ "Shimla me baraf giregi kya?"</span>
                   <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
                 </button>
               </div>
@@ -230,11 +230,11 @@
             </div>
             <div>
               <h3 class="font-bold text-slate-100 text-base">WeatherGPT AI Assistant</h3>
-              <p class="text-xs text-sky-400 font-medium">Multilingual NLP • Hinglish, Hindi, English</p>
+              <p class="text-xs text-sky-400 font-medium">Smart NLP • Dynamic Place Weather Fetching & Database Cache</p>
             </div>
           </div>
 
-          <!-- Voice Synthesis TTS & Mic Controls -->
+          <!-- Voice Synthesis TTS Controls -->
           <div class="flex items-center gap-2">
             <button id="tts-toggle-btn" class="p-2.5 rounded-xl bg-blue-600 text-white border border-blue-400/30 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Toggle Voice Readout">
               <i data-lucide="volume-2" class="w-4 h-4"></i>
@@ -252,20 +252,19 @@
                 <i data-lucide="bot" class="w-4 h-4"></i>
               </div>
               <div class="chat-bubble-bot px-4 py-3 text-sm md:text-base leading-relaxed">
-                <p>Namaste! Main <strong class="text-sky-300 font-semibold">WeatherGPT</strong> hoon. Aaj main aapki weather, rain prediction, umbrella alert aur climate info me kaise madad kar sakta hoon?</p>
+                <p>Namaste! Main <strong class="text-sky-300 font-semibold">WeatherGPT</strong> hoon. Aap kisi bhi jagah (jaise <em>"Mumbai me weather kaisa hai?"</em>, <em>"Is it raining in London?"</em>, <em>"Shimla temperature"</em>) ka mausam pooch sakte hain!</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Quick Hinglish/Hindi Query Chips Bar -->
+        <!-- Quick Query Chips Bar -->
         <div class="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none text-xs">
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Aaj weather kaisa hai?">🌤️ Aaj weather kaisa hai?</button>
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Kal baarish hogi?">🌧️ Kal baarish hogi?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Mumbai me weather kaisa hai?">🌊 Mumbai weather?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Lucknow me kal baarish hogi?">🌧️ Lucknow rain?</button>
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Should I carry an umbrella?">☔ Carry umbrella?</button>
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Temperature kya rahega?">🌡️ Temperature kya rahega?</button>
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Weather alert hai kya?">⚠️ Weather alert?</button>
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Weekend forecast?">📅 Weekend forecast?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Shimla me temperature kya hai?">❄️ Shimla temp?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Is it sunny in London?">🌐 London sunny?</button>
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Hindi mein weather batao">🇮🇳 Hindi mein batao</button>
         </div>
 
@@ -274,7 +273,7 @@
           <button id="mic-input-btn" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all shrink-0" title="Voice Input">
             <i data-lucide="mic" class="w-5 h-5 text-sky-400"></i>
           </button>
-          <input type="text" id="chat-input-text" placeholder="Ask WeatherGPT in Hinglish, Hindi, or English (e.g. 'Aaj weather kaisa hai?')..." 
+          <input type="text" id="chat-input-text" placeholder="Ask weather for ANY city or place (e.g. 'Mumbai me baarish hogi?', 'London temperature')..." 
             class="flex-1 glass-input px-4 py-3 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
           <button id="chat-send-btn" class="p-3 px-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-all shrink-0">
             <span>Send</span>
@@ -291,7 +290,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-2xl font-black text-white">Weather Forecast & Timeline</h2>
-          <p class="text-xs text-slate-400">Hourly predictions and 7-day extended meteorological forecast</p>
+          <p class="text-xs text-slate-400">Hourly predictions and 7-day extended forecast</p>
         </div>
       </div>
 

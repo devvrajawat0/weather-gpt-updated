@@ -1,14 +1,14 @@
 /**
  * WeatherGPT Core Application Controller (SIH26068)
  * Manages App State, Screen Routing (6 Screens), Open-Meteo Live API,
- * Tehsil & World Capital Geocoding, Forecast Charts, and Completion Countdown.
+ * City Geocoding, Forecast Charts, and Device Live Location.
  */
 
 class WeatherGPTApp {
   constructor() {
     this.currentScreen = 'dashboard';
     this.location = {
-      name: 'New Delhi, India',
+      name: 'Detecting Location...',
       lat: 28.6139,
       lon: 77.2090,
       country: 'India'
@@ -29,8 +29,8 @@ class WeatherGPTApp {
     this.setupSettingsHandlers();
     this.initCountdownTimer();
     
-    // Fetch initial weather data for default location
-    await this.fetchWeatherData(this.location.lat, this.location.lon, this.location.name);
+    // Automatically use device's actual current location on app startup!
+    this.useCurrentGeolocation();
 
     // Initial lucide icons rendering
     if (window.lucide) lucide.createIcons();
@@ -50,18 +50,15 @@ class WeatherGPTApp {
   switchScreen(screenName) {
     this.currentScreen = screenName;
 
-    // Hide all screens
     document.querySelectorAll('.screen-view').forEach(screen => {
       screen.classList.add('hidden');
     });
 
-    // Show target screen
     const activeScreen = document.getElementById(`screen-${screenName}`);
     if (activeScreen) {
       activeScreen.classList.remove('hidden');
     }
 
-    // Update nav links active styling
     document.querySelectorAll('[data-screen]').forEach(link => {
       const isTarget = link.getAttribute('data-screen') === screenName;
       link.classList.toggle('active', isTarget);
@@ -69,7 +66,6 @@ class WeatherGPTApp {
       link.classList.toggle('text-slate-400', !isTarget);
     });
 
-    // Refresh charts or screen-specific elements
     if (screenName === 'forecast') {
       this.renderForecastChart();
     }
@@ -100,7 +96,6 @@ class WeatherGPTApp {
       });
     });
 
-    // Handle Geolocation Button
     const geoBtn = document.getElementById('current-geo-btn');
     if (geoBtn) {
       geoBtn.addEventListener('click', () => this.useCurrentGeolocation());
@@ -145,7 +140,7 @@ class WeatherGPTApp {
           </div>
         </div>
         <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${place.country === 'India' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">
-          ${place.country === 'India' ? 'Tehsil/District' : 'World City'}
+          ${place.country === 'India' ? 'India City' : 'World City'}
         </span>
       `;
 
@@ -175,27 +170,39 @@ class WeatherGPTApp {
 
   useCurrentGeolocation() {
     if (!navigator.geolocation) {
-      alert('Geolocation system permissions not available in this browser.');
+      this.fetchWeatherData(28.6139, 77.2090, 'Delhi, India');
       return;
     }
 
+    this.showGlobalLoader(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
-        const name = `Current Location (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
-        this.location = { name, lat, lon };
-        await this.fetchWeatherData(lat, lon, name);
+        // Geocode lat/lon into readable place name
+        try {
+          const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${lat},${lon}&count=1`);
+          const data = await res.json();
+          const name = data.results && data.results[0] ? `${data.results[0].name}, ${data.results[0].country}` : `Live Location (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
+          this.location = { name, lat, lon };
+          await this.fetchWeatherData(lat, lon, name);
+        } catch(e) {
+          const name = `Live Location (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
+          this.location = { name, lat, lon };
+          await this.fetchWeatherData(lat, lon, name);
+        }
       },
       (err) => {
-        alert('Geolocation request denied or timed out. Falling back to Delhi.');
-      }
+        console.warn('Geolocation fallback to Delhi:', err.message);
+        this.location = { name: 'Delhi, India', lat: 28.6139, lon: 77.2090, country: 'India' };
+        this.fetchWeatherData(28.6139, 77.2090, 'Delhi, India');
+      },
+      { timeout: 8000 }
     );
   }
 
   async fetchWeatherData(lat, lon, locationName) {
     try {
-      // Show loader indicator
       this.showGlobalLoader(true);
 
       const [weatherRes, aqiRes] = await Promise.all([
@@ -208,7 +215,6 @@ class WeatherGPTApp {
 
       this.showGlobalLoader(false);
 
-      // Update UI components across all screens
       this.updateDashboardUI(locationName);
       this.updateForecastUI();
       this.updateAlertsUI();
@@ -232,7 +238,6 @@ class WeatherGPTApp {
     const windSpeed = Math.round(cur.windspeed || 12);
     const wCode = cur.weathercode || 0;
 
-    // DOM Updates
     const locElem = document.getElementById('dash-location-name');
     const tempElem = document.getElementById('dash-temp-main');
     const conditionElem = document.getElementById('dash-condition-text');
@@ -247,11 +252,9 @@ class WeatherGPTApp {
     if (windElem) windElem.innerText = `${windSpeed} km/h`;
     if (rainProbElem) rainProbElem.innerText = `${rainProb}%`;
 
-    // Condition interpretation
     const condMeta = this.getWeatherConditionMeta(wCode, rainProb);
     if (conditionElem) conditionElem.innerText = condMeta.text;
 
-    // Umbrella Recommendation Card
     if (umbrellaBadge) {
       const needUmbrella = rainProb > 40 || condMeta.mode === 'rain' || condMeta.mode === 'thunder';
       umbrellaBadge.className = `p-4 rounded-2xl border flex items-center gap-3 transition-all ${needUmbrella ? 'bg-amber-500/20 border-amber-500/40 text-amber-200' : 'bg-sky-500/20 border-sky-500/40 text-sky-200'}`;
@@ -272,7 +275,6 @@ class WeatherGPTApp {
   updateForecastUI() {
     if (!this.weatherData || !this.weatherData.daily) return;
 
-    // 1. Hourly Timeline Cards
     const hourlyContainer = document.getElementById('hourly-cards-container');
     if (hourlyContainer && this.weatherData.hourly) {
       hourlyContainer.innerHTML = '';
@@ -298,7 +300,6 @@ class WeatherGPTApp {
       });
     }
 
-    // 2. 7-Day Extended Cards
     const dailyContainer = document.getElementById('daily-cards-container');
     if (dailyContainer) {
       dailyContainer.innerHTML = '';
@@ -413,10 +414,9 @@ class WeatherGPTApp {
       alertList.push({ title: '🌧️ Heavy Rain & Waterlogging Advisory', severity: 'Moderate', desc: 'High rainfall chance. Drive carefully and keep umbrella/rainwear ready.', color: 'border-sky-500/60 bg-sky-950/40 text-sky-200' });
     }
     if (temp > 38) {
-      alertList.push({ title: '🔥 Extreme Heatwave Warning', severity: 'Severe', desc: 'High daytime temperatures exceeding 38°C. Stay hydrated and avoid midday direct sun exposure.', color: 'border-rose-500/60 bg-rose-950/40 text-rose-200' });
+      alertList.push({ title: '🔥 Extreme Heatwave Warning', severity: 'Severe', desc: 'High daytime temperatures. Stay hydrated and avoid direct sun exposure.', color: 'border-rose-500/60 bg-rose-950/40 text-rose-200' });
     }
 
-    // Default safe alert if no critical weather
     if (alertList.length === 0) {
       alertList.push({ title: '✅ Normal Weather Condition', severity: 'Low', desc: 'No active severe weather warnings for this location. Safe for outdoor activities.', color: 'border-emerald-500/60 bg-emerald-950/40 text-emerald-200' });
     }
@@ -511,7 +511,6 @@ class WeatherGPTApp {
   }
 
   setupSettingsHandlers() {
-    // Language Switcher
     const langSelect = document.getElementById('setting-lang-select');
     if (langSelect) {
       langSelect.addEventListener('change', (e) => {
@@ -519,7 +518,6 @@ class WeatherGPTApp {
       });
     }
 
-    // Temperature Unit Switcher
     const unitToggle = document.getElementById('setting-unit-toggle');
     if (unitToggle) {
       unitToggle.addEventListener('change', (e) => {
@@ -533,9 +531,6 @@ class WeatherGPTApp {
     const timerElem = document.getElementById('completion-countdown-timer');
     if (!timerElem) return;
 
-    // Set countdown duration target (Completion verification badge)
-    let totalSeconds = 0; // Completed status!
-    
     timerElem.innerText = '00:00:00 - Project Deployed & Live!';
     timerElem.className = 'font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30 shadow-sm animate-pulse';
   }
@@ -547,6 +542,8 @@ class WeatherGPTApp {
 
     return {
       locationName: this.location.name,
+      lat: this.location.lat,
+      lon: this.location.lon,
       temp: cur.temperature !== undefined ? cur.temperature : 28,
       weatherCode: cur.weathercode !== undefined ? cur.weathercode : 0,
       windSpeed: cur.windspeed !== undefined ? cur.windspeed : 12,

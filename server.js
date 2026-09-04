@@ -51,16 +51,147 @@ function writeDB(data) {
   }
 }
 
+// Known cities dictionary for fast offline database lookup fallback
+const POPULAR_LOCATIONS = [
+  { name: "Mumbai, Maharashtra", lat: 19.0760, lon: 72.8777, keywords: ["mumbai", "bombay"] },
+  { name: "Delhi, India", lat: 28.6139, lon: 77.2090, keywords: ["delhi", "dilli", "ncr", "new delhi"] },
+  { name: "Lucknow, UP", lat: 26.8467, lon: 80.9462, keywords: ["lucknow", "lakhnau"] },
+  { name: "Shimla, HP", lat: 31.1048, lon: 77.1734, keywords: ["shimla", "simla"] },
+  { name: "Jaipur, Rajasthan", lat: 26.9124, lon: 75.7873, keywords: ["jaipur"] },
+  { name: "Bangalore, Karnataka", lat: 12.9716, lon: 77.5946, keywords: ["bangalore", "bengaluru"] },
+  { name: "Pune, Maharashtra", lat: 18.5204, lon: 73.8567, keywords: ["pune", "poona"] },
+  { name: "Patna, Bihar", lat: 25.5941, lon: 85.1376, keywords: ["patna"] },
+  { name: "Kolkata, West Bengal", lat: 22.5726, lon: 88.3639, keywords: ["kolkata", "calcutta"] },
+  { name: "Chennai, Tamil Nadu", lat: 13.0827, lon: 80.2707, keywords: ["chennai", "madras"] },
+  { name: "Hyderabad, Telangana", lat: 17.3850, lon: 78.4867, keywords: ["hyderabad"] },
+  { name: "Ahmedabad, Gujarat", lat: 23.0225, lon: 72.5714, keywords: ["ahmedabad"] },
+  { name: "Goa, India", lat: 15.2993, lon: 74.1240, keywords: ["goa"] },
+  { name: "Dehradun, Uttarakhand", lat: 30.3165, lon: 78.0322, keywords: ["dehradun"] },
+  { name: "Varanasi, UP", lat: 25.3176, lon: 82.9739, keywords: ["varanasi", "banaras", "kashi"] },
+  { name: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, keywords: ["tokyo"] },
+  { name: "London, UK", lat: 51.5074, lon: -0.1278, keywords: ["london"] },
+  { name: "New York, USA", lat: 40.7128, lon: -74.0060, keywords: ["new york", "nyc"] },
+  { name: "Paris, France", lat: 48.8566, lon: 2.3522, keywords: ["paris"] },
+  { name: "Dubai, UAE", lat: 25.2048, lon: 55.2708, keywords: ["dubai"] }
+];
+
+// Smart Location Extractor from User Question
+async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
+  const q = (userQuery || '').toLowerCase();
+  const db = readDB();
+
+  let targetLocation = null;
+
+  // 1. Check local DB savedLocations
+  if (db.savedLocations && db.savedLocations.length > 0) {
+    for (let loc of db.savedLocations) {
+      const nameClean = loc.name.toLowerCase();
+      const firstWord = nameClean.split(',')[0].trim();
+      if (q.includes(firstWord) && firstWord.length > 2) {
+        targetLocation = { name: loc.name, lat: loc.lat, lon: loc.lon };
+        break;
+      }
+    }
+  }
+
+  // 2. Check popular locations dictionary
+  if (!targetLocation) {
+    for (let item of POPULAR_LOCATIONS) {
+      if (item.keywords.some(kw => q.includes(kw))) {
+        targetLocation = { name: item.name, lat: item.lat, lon: item.lon };
+        break;
+      }
+    }
+  }
+
+  // 3. Search via Open-Meteo Geocoding API if unknown city mentioned
+  if (!targetLocation) {
+    // Extract capitalized words or words after 'in', 'me', 'at', 'near', 'ka', 'ki'
+    const match = q.match(/(?:in|me|at|near|ka|ki|for)\s+([a-z\s]+)/i);
+    let searchWord = match ? match[1].trim().split(' ')[0] : null;
+
+    if (!searchWord) {
+      // Try searching for any word with length >= 4 that is not a common weather keyword
+      const stopWords = ["weather", "temperature", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "weekend", "hindi", "umbrella", "chhata", "hawa", "climate", "haalat"];
+      const words = q.split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
+      searchWord = words.find(w => w.length >= 4 && !stopWords.includes(w));
+    }
+
+    if (searchWord && searchWord.length >= 3) {
+      try {
+        const geoData = await fetchHttps(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchWord)}&count=1&language=en&format=json`);
+        if (geoData.results && geoData.results.length > 0) {
+          const place = geoData.results[0];
+          const placeName = `${place.name}${place.admin1 ? ', ' + place.admin1 : ''}${place.country ? ', ' + place.country : ''}`;
+          targetLocation = { name: placeName, lat: place.latitude, lon: place.longitude };
+
+          // Cache new location in DB
+          db.savedLocations = db.savedLocations || [];
+          if (!db.savedLocations.some(l => l.name === placeName)) {
+            db.savedLocations.push({ name: placeName, lat: place.latitude, lon: place.longitude, type: place.country === 'India' ? 'District' : 'World City', country: place.country });
+            writeDB(db);
+          }
+        }
+      } catch (err) {
+        console.error('Dynamic geocoding error:', err);
+      }
+    }
+  }
+
+  // Fallback to default location provided in context (Current Device Location)
+  if (!targetLocation) {
+    targetLocation = {
+      name: defaultContext.locationName || 'Current Location',
+      lat: defaultContext.lat || 28.6139,
+      lon: defaultContext.lon || 77.2090
+    };
+  }
+
+  // Fetch live weather data for the extracted target location
+  try {
+    const weatherRes = await fetchHttps(`https://api.open-meteo.com/v1/forecast?latitude=${targetLocation.lat}&longitude=${targetLocation.lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&daily=precipitation_probability_max,temperature_2m_max,temperature_2m_min&timezone=auto`);
+    
+    const cur = weatherRes.current_weather || {};
+    const rainProb = weatherRes.hourly && weatherRes.hourly.precipitation_probability ? weatherRes.hourly.precipitation_probability[0] || 10 : 10;
+    const humidity = weatherRes.hourly && weatherRes.hourly.relativehumidity_2m ? weatherRes.hourly.relativehumidity_2m[0] || 60 : 60;
+
+    return {
+      locationName: targetLocation.name,
+      temp: cur.temperature !== undefined ? Math.round(cur.temperature) : (defaultContext.temp || 28),
+      weatherCode: cur.weathercode !== undefined ? cur.weathercode : 0,
+      windSpeed: cur.windspeed !== undefined ? Math.round(cur.windspeed) : 12,
+      rainProb: rainProb,
+      humidity: humidity,
+      aqi: defaultContext.aqi || 45
+    };
+  } catch (err) {
+    console.error('Weather fetch error for location:', err);
+    return {
+      locationName: targetLocation.name,
+      temp: defaultContext.temp || 28,
+      weatherCode: 0,
+      windSpeed: 12,
+      rainProb: 15,
+      humidity: 60,
+      aqi: 45
+    };
+  }
+}
+
 // AI Engine for Multilingual Chat Processing
-function processWeatherGPTChat(query, weatherContext = {}, language = 'hinglish') {
+async function processWeatherGPTChat(query, defaultContext = {}, language = 'hinglish') {
   const q = (query || '').toLowerCase().trim();
-  const location = weatherContext.locationName || 'Aapki location';
-  const temp = weatherContext.temp !== undefined ? Math.round(weatherContext.temp) : 28;
-  const weatherCode = weatherContext.weatherCode !== undefined ? weatherContext.weatherCode : 0;
-  const rainProb = weatherContext.rainProb !== undefined ? weatherContext.rainProb : 10;
-  const aqi = weatherContext.aqi !== undefined ? weatherContext.aqi : 45;
-  const humidity = weatherContext.humidity !== undefined ? weatherContext.humidity : 60;
-  const windSpeed = weatherContext.windSpeed !== undefined ? weatherContext.windSpeed : 12;
+
+  // Dynamically analyze query, extract location if specified, and fetch live weather
+  const weatherContext = await extractLocationAndFetchWeather(query, defaultContext);
+
+  const location = weatherContext.locationName;
+  const temp = weatherContext.temp;
+  const weatherCode = weatherContext.weatherCode;
+  const rainProb = weatherContext.rainProb;
+  const aqi = weatherContext.aqi;
+  const humidity = weatherContext.humidity;
+  const windSpeed = weatherContext.windSpeed;
 
   // Decode weather condition code (WMO standard)
   let conditionText = 'Saaf Aakash (Clear Sky)';
@@ -80,7 +211,6 @@ function processWeatherGPTChat(query, weatherContext = {}, language = 'hinglish'
     ? '☔ Haan, aaj chhata (umbrella) saath rakhein! Baarish hone ki sambhavna hai.'
     : '☀️ Nahin, aaj chhata ki zarurat nahi hai. Mausam saaf rahne ki ummeed hai.';
 
-  // Response generation based on Intent
   let responseText = '';
   let category = 'general';
   let speechText = '';
@@ -88,64 +218,48 @@ function processWeatherGPTChat(query, weatherContext = {}, language = 'hinglish'
   // 1. Umbrella Query
   if (q.includes('umbrella') || q.includes('chhata') || q.includes('chata') || q.includes('raincoat')) {
     category = 'umbrella';
-    responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability abhi **${rainProb}%** hai aur temperature **${temp}°C** hai.`;
-    speechText = carryUmbrella ? "Haan, baarish ki sambhavna hai. Chhata saath le jaana mat bhoolna." : "Nahi, aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.";
+    responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.`;
+    speechText = carryUmbrella ? `${location} me baarish ki sambhavna hai. Chhata saath le jaana mat bhoolna.` : `${location} me aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.`;
   }
-  // 2. Today's weather query ("Aaj weather kaisa hai?")
-  else if (q.includes('aaj') || q.includes('today') || q.includes('kaisa hai') || q.includes('current weather')) {
+  // 2. Weather query ("Aaj weather kaisa hai?" or specific place weather)
+  else if (q.includes('kaisa') || q.includes('weather') || q.includes('mausam') || q.includes('today') || q.includes('aaj') || q.includes('how is')) {
     category = 'today';
-    responseText = `📍 **${location}** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** ${temp}°C\n• 🌤️ **Sthiti:** ${conditionText}\n• 🌧️ **Baarish Probability:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind Speed:** ${windSpeed} km/h\n\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Din me outdoor activities ke liye mausam badhiya hai.'}`;
+    responseText = `📍 **${location}** ka live mausam report:\n\n• 🌡️ **Temperature:** ${temp}°C\n• 🌤️ **Sthiti:** ${conditionText}\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind Speed:** ${windSpeed} km/h\n\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Outside activities ke liye mausam acha hai.'}`;
     speechText = `${location} me abhi temperature ${temp} degree celsius hai. Mausam ${conditionText} hai aur baarish ki sambhavna ${rainProb} percent hai.`;
   }
-  // 3. Tomorrow / Rain query ("Kal baarish hogi?")
-  else if (q.includes('kal') || q.includes('tomorrow') || q.includes('baarish') || q.includes('barish') || q.includes('rain')) {
+  // 3. Rain / Baarish Query
+  else if (q.includes('baarish') || q.includes('barish') || q.includes('rain') || q.includes('kal') || q.includes('tomorrow')) {
     category = 'rain';
-    const tomorrowRain = Math.min(100, Math.max(0, rainProb + (Math.random() > 0.5 ? 15 : -10)));
-    responseText = `🌧️ **Baarish Forecast for ${location}:**\n\n• Aaj baarish ki sambhavna **${rainProb}%** hai.\n• Kal aakash me baadal chaye rahne aur lagbhag **${Math.round(tomorrowRain)}%** baarish ki sambhavna hai.\n\n${tomorrowRain > 50 ? '⚠️ Rain alert: Waterlogging aur traffic disruption se bachne ke liye tayyari rakhein.' : '✅ Baarish ki badi warning nahi hai.'}`;
-    speechText = `Kal ${location} me baarish ki sambhavna lagbhag ${Math.round(tomorrowRain)} percent hai.`;
+    responseText = `🌧️ **Rain Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Status: **${conditionText}**\n\n${rainProb > 45 ? '⚠️ High rain alert: Waterlogging aur traffic disruption se bachne ke liye tayyari rakhein.' : '✅ Abhi heavy rainfall ki badi warning nahi hai.'}`;
+    speechText = `${location} me baarish ki sambhavna lagbhag ${rainProb} percent hai.`;
   }
-  // 4. Temperature query ("Temperature kya rahega?")
+  // 4. Temperature query
   else if (q.includes('temp') || q.includes('temperature') || q.includes('garmi') || q.includes('sardi') || q.includes('thand')) {
     category = 'temperature';
-    responseText = `🌡️ **Temperature Status for ${location}:**\n\n• Abhi ka taapmaan: **${temp}°C**\n• Maximum expected: **${temp + 4}°C**\n• Minimum expected: **${temp - 5}°C**\n• RealFeel: **${temp + 2}°C**\n\n${temp > 35 ? '🔥 Garmi zyada hai, hydration banaye rakhein!' : temp < 15 ? '❄️ Thand hai, garm kapde pehno!' : '🌿 Mausam suhana hai.'}`;
-    speechText = `${location} me abhi taapmaan ${temp} degree celsius hai. Real feel lagbhag ${temp + 2} degree hai.`;
+    responseText = `🌡️ **Temperature Details for ${location}:**\n\n• Current Temp: **${temp}°C**\n• High expected: **${temp + 4}°C**\n• Low expected: **${temp - 4}°C**\n• RealFeel: **${temp + 2}°C**\n\n${temp > 35 ? '🔥 Garmi zyada hai, hydration banaye rakhein!' : temp < 15 ? '❄️ Thand hai, garm kapde pehno!' : '🌿 Mausam suhana hai.'}`;
+    speechText = `${location} me abhi taapmaan ${temp} degree celsius hai.`;
   }
-  // 5. Weather Alert query ("Weather alert hai kya?")
-  else if (q.includes('alert') || q.includes('warning') || q.includes('danger') || q.includes('khatra')) {
+  // 5. Alert query
+  else if (q.includes('alert') || q.includes('warning') || q.includes('khatra')) {
     category = 'alert';
     if (isThunder) {
-      responseText = `⚠️ **CRITICAL WEATHER ALERT:**\n\n📍 ${location} me **Thunderstorm & Lightning Warning** jaari ki gayi hai!\n• Bijli kadakne ki sambhavna hai.\n• Khule maidaan aur pedon ke neeche khade na ho. Heavy rain expected!`;
+      responseText = `⚠️ **CRITICAL WEATHER ALERT:**\n\n📍 ${location} me **Thunderstorm Warning** active hai! Bijli kadakne aur heavy rain ki sambhavna hai.`;
     } else if (temp > 38) {
-      responseText = `⚠️ **HEATWAVE ADVISORY:**\n\n📍 ${location} me high temperature (**${temp}°C**) ka alert hai! Dhoop me nikalne se bachein aur paani pite rahein.`;
-    } else if (aqi > 200) {
-      responseText = `⚠️ **AIR QUALITY HAZARD ALERT:**\n\n📍 ${location} ka AQI **${aqi} (Poor)** hai! Mask ka prayog karein aur outdoor exercise reduce karein.`;
+      responseText = `⚠️ **HEATWAVE WARNING:**\n\n📍 ${location} me high temperature (**${temp}°C**) hai! Direct dhoop se bachein.`;
     } else {
-      responseText = `✅ **No Severe Weather Alerts!**\n\n📍 ${location} ke liye abhi koi emergency weather warning active nahi hai. Mausam control me hai.`;
+      responseText = `✅ **No Emergency Warnings:**\n\n📍 ${location} ke liye abhi koi severe alert active nahi hai. Mausam normal hai.`;
     }
-    speechText = `Weather alert report: ${location} me abhi koi severe warning nahi hai. Mausam saaf hai.`;
+    speechText = `${location} me abhi koi severe warning active nahi hai.`;
   }
-  // 6. Weekend forecast ("Weekend forecast?")
-  else if (q.includes('weekend') || q.includes('saturday') || q.includes('sunday') || q.includes('hfta')) {
-    category = 'weekend';
-    responseText = `📅 **Weekend Weather Outlook for ${location}:**\n\n• **Saturday:** 🌤️ ${temp + 1}°C | Partly Cloudy | Rain Prob: ${Math.max(5, rainProb - 10)}%\n• **Sunday:** 🌧️ ${temp}°C | Light Showers Expected | Rain Prob: ${Math.min(90, rainProb + 25)}%\n\n👉 Sunday ko outdoor plans ke liye chhata saath rakhein!`;
-    speechText = `Weekend me Saturday ko mausam saaf rahega, jabki Sunday ko light rain hone ki sambhavna hai.`;
-  }
-  // 7. Air / Climate info ("Air/climate information?")
-  else if (q.includes('air') || q.includes('climate') || q.includes('aqi') || q.includes('pollution') || q.includes('hawa')) {
-    category = 'climate';
-    let aqiStatus = aqi <= 50 ? 'Good 😊' : aqi <= 100 ? 'Moderate 😐' : aqi <= 200 ? 'Unhealthy 😷' : 'Hazardous ⚠️';
-    responseText = `🍃 **Climate & Air Quality Report for ${location}:**\n\n• **AQI Index:** ${aqi} (${aqiStatus})\n• **PM2.5 Level:** ${Math.round(aqi * 0.45)} µg/m³\n• **PM10 Level:** ${Math.round(aqi * 0.8)} µg/m³\n• **UV Index:** ${temp > 30 ? '7 (High)' : '4 (Moderate)'}\n\n👉 Climate tip: Green transportation and planting trees help improve local microclimate!`;
-    speechText = `${location} ka Air Quality Index ${aqi} hai jo ki ${aqiStatus} category me aata hai.`;
-  }
-  // 8. Hindi query request ("Hindi mein weather batao")
+  // 6. Hindi request
   else if (q.includes('hindi') || q.includes('हिंदी')) {
     category = 'hindi';
-    responseText = `🇮🇳 **मौसम की जानकारी (${location}):**\n\n• वर्तमान तापमान: **${temp}°C**\n• स्थिति: **${conditionText}**\n• बारिश की संभावना: **${rainProb}%**\n• हवा की गति: **${windSpeed} किमी/घंटा**\n\n${carryUmbrella ? '👉 सलाह: बाहर जाते समय छाता साथ रखें।' : '👉 सलाह: आज मौसम अनुकूल रहेगा।'}`;
+    responseText = `🇮🇳 **मौसम रिपोर्ट (${location}):**\n\n• तापमान: **${temp}°C**\n• स्थिति: **${conditionText}**\n• बारिश की संभावना: **${rainProb}%**\n• हवा की गति: **${windSpeed} किमी/घंटा**\n\n${carryUmbrella ? '👉 सलाह: छाता साथ रखें।' : '👉 सलाह: मौसम सुहावना है।'}`;
     speechText = `${location} mein vartaman tapman ${temp} degree celsius hai. Vrishti ki sambhavna ${rainProb} percent hai.`;
   }
-  // Default general query response
+  // Default query
   else {
-    responseText = `🤖 **WeatherGPT Smart Assistant:**\n\n📍 **${location}** Summary:\n• Temperature: **${temp}°C** (${conditionText})\n• Precipitation Chance: **${rainProb}%**\n• AQI Level: **${aqi}**\n\nAap inse judi aur jaankari pooch sakte hain:\n- "Aaj weather kaisa hai?"\n- "Kal baarish hogi?"\n- "Should I carry an umbrella?"\n- "Hindi mein weather batao"`;
+    responseText = `📍 **${location}** Weather Summary:\n\n• Temperature: **${temp}°C** (${conditionText})\n• Precipitation Chance: **${rainProb}%**\n• Humidity: **${humidity}%**\n\nAap inse judi jaankari pooch sakte hain:\n- "Aaj weather kaisa hai?"\n- "Should I carry an umbrella?"\n- "Mumbai me baarish hogi?"`;
     speechText = `${location} ka mausam abhi ${temp} degree celsius hai. Rain chance ${rainProb} percent hai.`;
   }
 
@@ -186,7 +300,6 @@ const server = http.createServer(async (req, res) => {
     const lat = parsedUrl.query.lat || 28.6139;
     const lon = parsedUrl.query.lon || 77.2090;
     
-    // Open-Meteo Weather API query
     const targetUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,weathercode,windspeed_10m,surface_pressure&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,uv_index_max&timezone=auto`;
     
     try {
@@ -218,7 +331,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Geocoding Search Endpoint (Indian Tehsils + World Capitals)
+  // 3. Geocoding Search Endpoint (Supports Indian Cities/Districts & World Capitals)
   if (pathname === '/api/geocoding' && method === 'GET') {
     const query = parsedUrl.query.q || '';
     if (!query) {
@@ -240,18 +353,18 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 4. AI Chat Processing Endpoint
+  // 4. AI Chat Processing Endpoint (Asynchronous NLP & Dynamic Weather Fetching)
   if (pathname === '/api/chat' && method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');
         const userQuery = payload.query || '';
-        const weatherContext = payload.context || {};
+        const defaultContext = payload.context || {};
         const language = payload.language || 'hinglish';
 
-        const botResponse = processWeatherGPTChat(userQuery, weatherContext, language);
+        const botResponse = await processWeatherGPTChat(userQuery, defaultContext, language);
 
         // Save to DB history
         const db = readDB();
@@ -260,15 +373,15 @@ const server = http.createServer(async (req, res) => {
         
         db.chatHistory = db.chatHistory || [];
         db.chatHistory.push(userMsg, botMsg);
-        // Keep last 50 messages
         if (db.chatHistory.length > 50) db.chatHistory = db.chatHistory.slice(-50);
         writeDB(db);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(botResponse));
       } catch (err) {
+        console.error('Chat Error:', err);
         res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
+        res.end(JSON.stringify({ error: 'Invalid JSON payload or server error' }));
       }
     });
     return;
@@ -335,7 +448,6 @@ const server = http.createServer(async (req, res) => {
   fs.readFile(filePath, (error, content) => {
     if (error) {
       if (error.code === 'ENOENT') {
-        // Fallback to index.html for SPA routing
         fs.readFile(path.join(PUBLIC_DIR, 'index.html'), (err, indexContent) => {
           if (err) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });

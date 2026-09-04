@@ -115,6 +115,101 @@
       "location": "Aapki location",
       "condition": "Saaf Aakash (Clear Sky)",
       "timestamp": "05:49 pm"
+    },
+    {
+      "id": 1788525181660,
+      "sender": "user",
+      "text": "Is it sunny in Mumbai today?",
+      "time": "06:03 pm"
+    },
+    {
+      "id": 1788525181661,
+      "sender": "bot",
+      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
+      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 10,
+      "temperature": 28,
+      "location": "Aapki location",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "06:03 pm"
+    },
+    {
+      "id": 1788525409173,
+      "sender": "user",
+      "text": "Aaj weather kaisa hai?",
+      "time": "06:06 pm"
+    },
+    {
+      "id": 1788525409174,
+      "sender": "bot",
+      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
+      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 10,
+      "temperature": 28,
+      "location": "Aapki location",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "06:06 pm"
+    },
+    {
+      "id": 1788525430039,
+      "sender": "user",
+      "text": "gwalior weather kaisa hai",
+      "time": "06:07 pm"
+    },
+    {
+      "id": 1788525430040,
+      "sender": "bot",
+      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
+      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 10,
+      "temperature": 28,
+      "location": "Aapki location",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "06:07 pm"
+    },
+    {
+      "id": 1788525491647,
+      "sender": "user",
+      "text": "Mumbai me baarish hogi kya?",
+      "time": "06:08 pm"
+    },
+    {
+      "id": 1788525491648,
+      "sender": "bot",
+      "text": "🌧️ **Rain Forecast for Mumbai, Maharashtra:**\n\n• Live Rain Chance: **88%**\n• Status: **Baarish (Rainy)**\n\n⚠️ High rain alert: Waterlogging aur traffic disruption se bachne ke liye tayyari rakhein.",
+      "speechText": "Mumbai, Maharashtra me baarish ki sambhavna lagbhag 88 percent hai.",
+      "category": "rain",
+      "umbrellaNeeded": true,
+      "rainProbability": 88,
+      "temperature": 27,
+      "location": "Mumbai, Maharashtra",
+      "condition": "Baarish (Rainy)",
+      "timestamp": "06:08 pm"
+    },
+    {
+      "id": 1788525508921,
+      "sender": "user",
+      "text": "London temperature",
+      "time": "06:08 pm"
+    },
+    {
+      "id": 1788525508923,
+      "sender": "bot",
+      "text": "🌡️ **Temperature Details for London:**\n\n• Current Temp: **21°C**\n• High expected: **25°C**\n• Low expected: **17°C**\n• RealFeel: **23°C**\n\n🌿 Mausam suhana hai.",
+      "speechText": "London me abhi taapmaan 21 degree celsius hai.",
+      "category": "temperature",
+      "umbrellaNeeded": false,
+      "rainProbability": 12,
+      "temperature": 21,
+      "location": "London",
+      "condition": "Baadal (Cloudy)",
+      "timestamp": "06:08 pm"
     }
   ]
 }
