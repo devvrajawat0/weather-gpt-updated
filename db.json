@@ -8,53 +8,39 @@
   },
   "savedLocations": [
     {
-      "name": "New Delhi, India",
+      "name": "Delhi, India",
       "lat": 28.6139,
       "lon": 77.209,
       "type": "Capital",
       "country": "India"
     },
     {
-      "name": "Mumbai Tehsil, Maharashtra",
+      "name": "Mumbai, Maharashtra",
       "lat": 19.076,
       "lon": 72.8777,
-      "type": "Tehsil/District",
+      "type": "District",
       "country": "India"
     },
     {
-      "name": "Lucknow Tehsil, UP",
+      "name": "Lucknow, UP",
       "lat": 26.8467,
       "lon": 80.9462,
-      "type": "Tehsil/District",
+      "type": "District",
       "country": "India"
     },
     {
-      "name": "Shimla Tehsil, Himachal Pradesh",
+      "name": "Shimla, HP",
       "lat": 31.1048,
       "lon": 77.1734,
-      "type": "Tehsil/District",
+      "type": "District",
       "country": "India"
     },
     {
-      "name": "Tokyo",
-      "lat": 35.6762,
-      "lon": 139.6503,
-      "type": "World Capital",
-      "country": "Japan"
-    },
-    {
-      "name": "London",
-      "lat": 51.5074,
-      "lon": -0.1278,
-      "type": "World Capital",
-      "country": "United Kingdom"
-    },
-    {
-      "name": "Weather, Pennsylvania, United States",
-      "lat": 40.94175,
-      "lon": -75.82825,
-      "type": "World City",
-      "country": "United States"
+      "name": "Jaipur, Rajasthan",
+      "lat": 26.9124,
+      "lon": 75.7873,
+      "type": "District",
+      "country": "India"
     }
   ],
   "customAlerts": [
@@ -84,348 +70,6 @@
       "text": "Namaste! Main WeatherGPT hoon. Aaj main aapki weather, precipitation, aur climate info me kaise madad kar sakta hoon?",
       "time": "Just now",
       "lang": "hinglish"
-    },
-    {
-      "id": 1788524334909,
-      "sender": "user",
-      "text": "Aaj weather kaisa hai?",
-      "time": "05:48 pm"
-    },
-    {
-      "id": 1788524334910,
-      "sender": "bot",
-      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
-      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 10,
-      "temperature": 28,
-      "location": "Aapki location",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "05:48 pm"
-    },
-    {
-      "id": 1788524340001,
-      "sender": "user",
-      "text": "Should I carry an umbrella?",
-      "time": "05:49 pm"
-    },
-    {
-      "id": 1788524340002,
-      "sender": "bot",
-      "text": "☀️ Nahin, aaj chhata ki zarurat nahi hai. Mausam saaf rahne ki ummeed hai.\n\n📍 **Aapki location** me rain probability abhi **10%** hai aur temperature **28°C** hai.",
-      "speechText": "Nahi, aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.",
-      "category": "umbrella",
-      "umbrellaNeeded": false,
-      "rainProbability": 10,
-      "temperature": 28,
-      "location": "Aapki location",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "05:49 pm"
-    },
-    {
-      "id": 1788525181660,
-      "sender": "user",
-      "text": "Is it sunny in Mumbai today?",
-      "time": "06:03 pm"
-    },
-    {
-      "id": 1788525181661,
-      "sender": "bot",
-      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
-      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 10,
-      "temperature": 28,
-      "location": "Aapki location",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:03 pm"
-    },
-    {
-      "id": 1788525409173,
-      "sender": "user",
-      "text": "Aaj weather kaisa hai?",
-      "time": "06:06 pm"
-    },
-    {
-      "id": 1788525409174,
-      "sender": "bot",
-      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
-      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 10,
-      "temperature": 28,
-      "location": "Aapki location",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:06 pm"
-    },
-    {
-      "id": 1788525430039,
-      "sender": "user",
-      "text": "gwalior weather kaisa hai",
-      "time": "06:07 pm"
-    },
-    {
-      "id": 1788525430040,
-      "sender": "bot",
-      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
-      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 10,
-      "temperature": 28,
-      "location": "Aapki location",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:07 pm"
-    },
-    {
-      "id": 1788525491647,
-      "sender": "user",
-      "text": "Mumbai me baarish hogi kya?",
-      "time": "06:08 pm"
-    },
-    {
-      "id": 1788525491648,
-      "sender": "bot",
-      "text": "🌧️ **Rain Forecast for Mumbai, Maharashtra:**\n\n• Live Rain Chance: **88%**\n• Status: **Baarish (Rainy)**\n\n⚠️ High rain alert: Waterlogging aur traffic disruption se bachne ke liye tayyari rakhein.",
-      "speechText": "Mumbai, Maharashtra me baarish ki sambhavna lagbhag 88 percent hai.",
-      "category": "rain",
-      "umbrellaNeeded": true,
-      "rainProbability": 88,
-      "temperature": 27,
-      "location": "Mumbai, Maharashtra",
-      "condition": "Baarish (Rainy)",
-      "timestamp": "06:08 pm"
-    },
-    {
-      "id": 1788525508921,
-      "sender": "user",
-      "text": "London temperature",
-      "time": "06:08 pm"
-    },
-    {
-      "id": 1788525508923,
-      "sender": "bot",
-      "text": "🌡️ **Temperature Details for London:**\n\n• Current Temp: **21°C**\n• High expected: **25°C**\n• Low expected: **17°C**\n• RealFeel: **23°C**\n\n🌿 Mausam suhana hai.",
-      "speechText": "London me abhi taapmaan 21 degree celsius hai.",
-      "category": "temperature",
-      "umbrellaNeeded": false,
-      "rainProbability": 12,
-      "temperature": 21,
-      "location": "London",
-      "condition": "Baadal (Cloudy)",
-      "timestamp": "06:08 pm"
-    },
-    {
-      "id": 1788525598629,
-      "sender": "user",
-      "text": "gwalior me weather kaisa hai?",
-      "time": "06:09 pm"
-    },
-    {
-      "id": 1788525598630,
-      "sender": "bot",
-      "text": "📍 **Weather, Pennsylvania, United States** ka live mausam report:\n\n• 🌡️ **Temperature:** 23°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 11%\n• 💧 **Humidity:** 85%\n• 💨 **Wind Speed:** 17 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Weather, Pennsylvania, United States me abhi temperature 23 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 11 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 11,
-      "temperature": 23,
-      "location": "Weather, Pennsylvania, United States",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:09 pm"
-    },
-    {
-      "id": 1788525623017,
-      "sender": "user",
-      "text": "indore me weather kaisa hai?",
-      "time": "06:10 pm"
-    },
-    {
-      "id": 1788525623018,
-      "sender": "bot",
-      "text": "📍 **Weather, Pennsylvania, United States** ka live mausam report:\n\n• 🌡️ **Temperature:** 23°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 11%\n• 💧 **Humidity:** 85%\n• 💨 **Wind Speed:** 17 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Weather, Pennsylvania, United States me abhi temperature 23 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 11 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 11,
-      "temperature": 23,
-      "location": "Weather, Pennsylvania, United States",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:10 pm"
-    },
-    {
-      "id": 1788525688231,
-      "sender": "user",
-      "text": "Shimla me baraf giregi kya?",
-      "time": "06:11 pm"
-    },
-    {
-      "id": 1788525688232,
-      "sender": "bot",
-      "text": "📍 **Shimla, HP** Weather Summary:\n\n• Temperature: **16°C** (Baadal (Cloudy))\n• Precipitation Chance: **1%**\n• Humidity: **99%**\n\nAap inse judi jaankari pooch sakte hain:\n- \"Aaj weather kaisa hai?\"\n- \"Should I carry an umbrella?\"\n- \"Mumbai me baarish hogi?\"",
-      "speechText": "Shimla, HP ka mausam abhi 16 degree celsius hai. Rain chance 1 percent hai.",
-      "category": "general",
-      "umbrellaNeeded": false,
-      "rainProbability": 1,
-      "temperature": 16,
-      "location": "Shimla, HP",
-      "condition": "Baadal (Cloudy)",
-      "timestamp": "06:11 pm"
-    },
-    {
-      "id": 1788525774966,
-      "sender": "user",
-      "text": "Hindi mein weather batao Jaipur ka",
-      "time": "06:12 pm"
-    },
-    {
-      "id": 1788525774967,
-      "sender": "bot",
-      "text": "📍 **Weather, Pennsylvania, United States** ka live mausam report:\n\n• 🌡️ **Temperature:** 23°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 11%\n• 💧 **Humidity:** 85%\n• 💨 **Wind Speed:** 17 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Weather, Pennsylvania, United States me abhi temperature 23 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 11 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 11,
-      "temperature": 23,
-      "location": "Weather, Pennsylvania, United States",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:12 pm"
-    },
-    {
-      "id": 1788525866550,
-      "sender": "user",
-      "text": "Hindi mein weather batao Jaipur ka",
-      "time": "06:14 pm"
-    },
-    {
-      "id": 1788525866551,
-      "sender": "bot",
-      "text": "📍 **Jaipur, Rajasthan** ka live mausam report:\n\n• 🌡️ **Temperature:** 27°C\n• 🌤️ **Sthiti:** Baarish (Rainy)\n• 🌧️ **Baarish Chance:** 20%\n• 💧 **Humidity:** 83%\n• 💨 **Wind Speed:** 3 km/h\n\n👉 Chhata saath me rakhein.",
-      "speechText": "Jaipur, Rajasthan me abhi temperature 27 degree celsius hai. Mausam Baarish (Rainy) hai aur baarish ki sambhavna 20 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": true,
-      "rainProbability": 20,
-      "temperature": 27,
-      "location": "Jaipur, Rajasthan",
-      "condition": "Baarish (Rainy)",
-      "timestamp": "06:14 pm"
-    },
-    {
-      "id": 1788525964417,
-      "sender": "user",
-      "text": "jaipur me weather kaisa hai?",
-      "time": "06:16 pm"
-    },
-    {
-      "id": 1788525964418,
-      "sender": "bot",
-      "text": "📍 **Jaipur, Rajasthan** ka live mausam report:\n\n• 🌡️ **Temperature:** 27°C\n• 🌤️ **Sthiti:** Baarish (Rainy)\n• 🌧️ **Baarish Chance:** 20%\n• 💧 **Humidity:** 83%\n• 💨 **Wind Speed:** 3 km/h\n\n👉 Chhata saath me rakhein.",
-      "speechText": "Jaipur, Rajasthan me abhi temperature 27 degree celsius hai. Mausam Baarish (Rainy) hai aur baarish ki sambhavna 20 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": true,
-      "rainProbability": 20,
-      "temperature": 27,
-      "location": "Jaipur, Rajasthan",
-      "condition": "Baarish (Rainy)",
-      "timestamp": "06:16 pm"
-    },
-    {
-      "id": 1788525981719,
-      "sender": "user",
-      "text": "gwalior me weather kaisa hai?",
-      "time": "06:16 pm"
-    },
-    {
-      "id": 1788525981720,
-      "sender": "bot",
-      "text": "📍 **Weather, Pennsylvania, United States** ka live mausam report:\n\n• 🌡️ **Temperature:** 23°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 11%\n• 💧 **Humidity:** 85%\n• 💨 **Wind Speed:** 17 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Weather, Pennsylvania, United States me abhi temperature 23 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 11 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 11,
-      "temperature": 23,
-      "location": "Weather, Pennsylvania, United States",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:16 pm"
-    },
-    {
-      "id": 1788525992678,
-      "sender": "user",
-      "text": "gwalior me weather kaisa hai?",
-      "time": "06:16 pm"
-    },
-    {
-      "id": 1788525992679,
-      "sender": "bot",
-      "text": "📍 **Weather, Pennsylvania, United States** ka live mausam report:\n\n• 🌡️ **Temperature:** 23°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 11%\n• 💧 **Humidity:** 85%\n• 💨 **Wind Speed:** 17 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Weather, Pennsylvania, United States me abhi temperature 23 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 11 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 11,
-      "temperature": 23,
-      "location": "Weather, Pennsylvania, United States",
-      "condition": "Saaf Aakash (Clear Sky)",
-      "timestamp": "06:16 pm"
-    },
-    {
-      "id": 1788526008857,
-      "sender": "user",
-      "text": "delhi me weather kaisa hai?",
-      "time": "06:16 pm"
-    },
-    {
-      "id": 1788526008858,
-      "sender": "bot",
-      "text": "📍 **Delhi, India** ka live mausam report:\n\n• 🌡️ **Temperature:** 29°C\n• 🌤️ **Sthiti:** Baadal (Cloudy)\n• 🌧️ **Baarish Chance:** 20%\n• 💧 **Humidity:** 95%\n• 💨 **Wind Speed:** 5 km/h\n\n👉 Outside activities ke liye mausam acha hai.",
-      "speechText": "Delhi, India me abhi temperature 29 degree celsius hai. Mausam Baadal (Cloudy) hai aur baarish ki sambhavna 20 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": false,
-      "rainProbability": 20,
-      "temperature": 29,
-      "location": "Delhi, India",
-      "condition": "Baadal (Cloudy)",
-      "timestamp": "06:16 pm"
-    },
-    {
-      "id": 1788527316849,
-      "sender": "user",
-      "text": "Mumbai me weather kaisa hai?",
-      "time": "06:38 pm"
-    },
-    {
-      "id": 1788527316850,
-      "sender": "bot",
-      "text": "📍 **Mumbai, Maharashtra** ka live mausam report:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Baarish (Rainy)\n• 🌧️ **Baarish Chance:** 88%\n• 💧 **Humidity:** 88%\n• 💨 **Wind Speed:** 10 km/h\n\n👉 Chhata saath me rakhein.",
-      "speechText": "Mumbai, Maharashtra me abhi temperature 28 degree celsius hai. Mausam Baarish (Rainy) hai aur baarish ki sambhavna 88 percent hai.",
-      "category": "today",
-      "umbrellaNeeded": true,
-      "rainProbability": 88,
-      "temperature": 28,
-      "location": "Mumbai, Maharashtra",
-      "condition": "Baarish (Rainy)",
-      "timestamp": "06:38 pm"
-    },
-    {
-      "id": 1788527331385,
-      "sender": "user",
-      "text": "Lucknow me kal baarish hogi?",
-      "time": "06:38 pm"
-    },
-    {
-      "id": 1788527331386,
-      "sender": "bot",
-      "text": "🌧️ **Rain Forecast for Lucknow, UP:**\n\n• Live Rain Chance: **27%**\n• Status: **Baadal (Cloudy)**\n\n✅ Abhi heavy rainfall ki badi warning nahi hai.",
-      "speechText": "Lucknow, UP me baarish ki sambhavna lagbhag 27 percent hai.",
-      "category": "rain",
-      "umbrellaNeeded": false,
-      "rainProbability": 27,
-      "temperature": 27,
-      "location": "Lucknow, UP",
-      "condition": "Baadal (Cloudy)",
-      "timestamp": "06:38 pm"
     }
   ]
 }

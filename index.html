@@ -99,17 +99,18 @@
           <!-- Search Input with Auto-complete -->
           <div class="relative flex-1">
             <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-            <input type="text" id="dash-search-input" placeholder="Search any city or location in India or Worldwide (e.g. Mumbai, Lucknow, Shimla, Tokyo, London)..." 
+            <input type="text" id="dash-search-input" placeholder="Search any city or location (e.g. Mumbai, Lucknow, Shimla, Jaipur, Delhi)..." 
               class="w-full glass-input pl-12 pr-4 py-3.5 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
           </div>
 
-          <!-- Featured Location Chips -->
+          <!-- Featured Indian Location Chips -->
           <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none text-xs">
-            <span class="text-slate-400 font-semibold text-[11px] whitespace-nowrap">Popular:</span>
+            <span class="text-slate-400 font-semibold text-[11px] whitespace-nowrap">Popular Cities:</span>
             <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(19.0760, 72.8777, 'Mumbai, Maharashtra')">📍 Mumbai</button>
             <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(26.8467, 80.9462, 'Lucknow, UP')">📍 Lucknow</button>
             <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(31.1048, 77.1734, 'Shimla, HP')">📍 Shimla</button>
-            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(35.6762, 139.6503, 'Tokyo, Japan')">🌐 Tokyo</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(26.9124, 75.7873, 'Jaipur, Rajasthan')">📍 Jaipur</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(28.6139, 77.2090, 'Delhi, India')">📍 Delhi</button>
           </div>
         </div>
       </div>
@@ -230,7 +231,7 @@
             </div>
             <div>
               <h3 class="font-bold text-slate-100 text-base">WeatherGPT AI Assistant</h3>
-              <p class="text-xs text-sky-400 font-medium">Smart NLP • Dynamic Place Weather Fetching & Database Cache</p>
+              <p class="text-xs text-sky-400 font-medium">Smart NLP • Focused Location Weather Engine & Database Cache</p>
             </div>
           </div>
 
@@ -252,7 +253,7 @@
                 <i data-lucide="bot" class="w-4 h-4"></i>
               </div>
               <div class="chat-bubble-bot px-4 py-3 text-sm md:text-base leading-relaxed">
-                <p>Namaste! Main <strong class="text-sky-300 font-semibold">WeatherGPT</strong> hoon. Aap kisi bhi jagah (jaise <em>"Mumbai me weather kaisa hai?"</em>, <em>"Is it raining in London?"</em>, <em>"Shimla temperature"</em>) ka mausam pooch sakte hain!</p>
+                <p>Namaste! Main <strong class="text-sky-300 font-semibold">WeatherGPT</strong> hoon. Aap kisi bhi city/location (jaise <em>"Mumbai me weather kaisa hai?"</em>, <em>"Lucknow me baarish hogi?"</em>, <em>"Shimla temperature"</em>) ka mausam pooch sakte hain!</p>
               </div>
             </div>
           </div>
@@ -264,7 +265,7 @@
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Lucknow me kal baarish hogi?">🌧️ Lucknow rain?</button>
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Should I carry an umbrella?">☔ Carry umbrella?</button>
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Shimla me temperature kya hai?">❄️ Shimla temp?</button>
-          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Is it sunny in London?">🌐 London sunny?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Jaipur ka mausam kaisa hai?">🏰 Jaipur weather?</button>
           <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Hindi mein weather batao">🇮🇳 Hindi mein batao</button>
         </div>
 
@@ -273,7 +274,7 @@
           <button id="mic-input-btn" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all shrink-0" title="Voice Input">
             <i data-lucide="mic" class="w-5 h-5 text-sky-400"></i>
           </button>
-          <input type="text" id="chat-input-text" placeholder="Ask weather for ANY city or place (e.g. 'Mumbai me baarish hogi?', 'London temperature')..." 
+          <input type="text" id="chat-input-text" placeholder="Ask weather for ANY location (e.g. 'Mumbai me baarish hogi?', 'Jaipur temperature')..." 
             class="flex-1 glass-input px-4 py-3 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
           <button id="chat-send-btn" class="p-3 px-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-all shrink-0">
             <span>Send</span>

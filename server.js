@@ -51,7 +51,7 @@ function writeDB(data) {
   }
 }
 
-// Known cities dictionary for fast offline database lookup fallback
+// Comprehensive Indian cities & districts dictionary for fast offline database lookup fallback
 const POPULAR_LOCATIONS = [
   { name: "Mumbai, Maharashtra", lat: 19.0760, lon: 72.8777, keywords: ["mumbai", "bombay"] },
   { name: "Delhi, India", lat: 28.6139, lon: 77.2090, keywords: ["delhi", "dilli", "ncr", "new delhi"] },
@@ -74,14 +74,13 @@ const POPULAR_LOCATIONS = [
   { name: "Varanasi, UP", lat: 25.3176, lon: 82.9739, keywords: ["varanasi", "banaras", "kashi"] },
   { name: "Agra, UP", lat: 27.1767, lon: 78.0081, keywords: ["agra"] },
   { name: "Srinagar, J&K", lat: 34.0837, lon: 74.7973, keywords: ["srinagar"] },
-  { name: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, keywords: ["tokyo"] },
-  { name: "London, UK", lat: 51.5074, lon: -0.1278, keywords: ["london"] },
-  { name: "New York, USA", lat: 40.7128, lon: -74.0060, keywords: ["new york", "nyc"] },
-  { name: "Paris, France", lat: 48.8566, lon: 2.3522, keywords: ["paris"] },
-  { name: "Dubai, UAE", lat: 25.2048, lon: 55.2708, keywords: ["dubai"] }
+  { name: "Ranchi, Jharkhand", lat: 23.3441, lon: 85.3096, keywords: ["ranchi"] },
+  { name: "Bhubaneswar, Odisha", lat: 20.2961, lon: 85.8245, keywords: ["bhubaneswar"] },
+  { name: "Raipur, Chhattisgarh", lat: 21.2514, lon: 81.6296, keywords: ["raipur"] },
+  { name: "Guwahati, Assam", lat: 26.1445, lon: 91.7362, keywords: ["guwahati"] }
 ];
 
-// Smart Location Extractor from User Question
+// Smart Location Extractor from User Question (Focused on Indian Locations)
 async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
   const q = (userQuery || '').toLowerCase().trim();
   const db = readDB();
@@ -112,7 +111,6 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
   if (!targetLocation) {
     const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry"];
     
-    // Extract location after preposition or clean words list
     const match = q.match(/(?:in|me|at|near|ka|ki|for)\s+([a-z\s]+)/i);
     let candidateWord = null;
 
@@ -128,16 +126,18 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
 
     if (candidateWord && candidateWord.length >= 3) {
       try {
-        const geoData = await fetchHttps(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(candidateWord)}&count=1&language=en&format=json`);
+        // Search geocoding specifically with country code filter
+        const geoData = await fetchHttps(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(candidateWord)}&count=5&language=en&format=json`);
         if (geoData.results && geoData.results.length > 0) {
-          const place = geoData.results[0];
-          const placeName = `${place.name}${place.admin1 ? ', ' + place.admin1 : ''}${place.country ? ', ' + place.country : ''}`;
-          targetLocation = { name: placeName, lat: place.latitude, lon: place.longitude };
+          // Prioritize Indian locations
+          const indianResult = geoData.results.find(r => r.country === 'India') || geoData.results[0];
+          const placeName = `${indianResult.name}${indianResult.admin1 ? ', ' + indianResult.admin1 : ''}${indianResult.country ? ', ' + indianResult.country : ''}`;
+          targetLocation = { name: placeName, lat: indianResult.latitude, lon: indianResult.longitude };
 
           // Cache new location in DB
           db.savedLocations = db.savedLocations || [];
           if (!db.savedLocations.some(l => l.name === placeName)) {
-            db.savedLocations.push({ name: placeName, lat: place.latitude, lon: place.longitude, type: place.country === 'India' ? 'District' : 'World City', country: place.country });
+            db.savedLocations.push({ name: placeName, lat: indianResult.latitude, lon: indianResult.longitude, type: 'District', country: indianResult.country || 'India' });
             writeDB(db);
           }
         }
@@ -156,7 +156,7 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
     };
   }
 
-  // Fetch live weather data for the extracted target location
+  // Fetch live weather data for the target location
   try {
     const weatherRes = await fetchHttps(`https://api.open-meteo.com/v1/forecast?latitude=${targetLocation.lat}&longitude=${targetLocation.lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&daily=precipitation_probability_max,temperature_2m_max,temperature_2m_min&timezone=auto`);
     
@@ -202,7 +202,6 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
   const humidity = weatherContext.humidity;
   const windSpeed = weatherContext.windSpeed;
 
-  // Decode weather condition code (WMO standard)
   let conditionText = 'Saaf Aakash (Clear Sky)';
   let isRainy = rainProb > 40 || [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weatherCode);
   let isSnowy = [71, 73, 75, 77, 85, 86].includes(weatherCode);
@@ -214,7 +213,6 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
   else if (isRainy) conditionText = 'Baarish (Rainy)';
   else if (isCloudy) conditionText = 'Baadal (Cloudy)';
 
-  // Umbrella logic
   const carryUmbrella = isRainy || rainProb >= 45;
   const umbrellaAdvice = carryUmbrella
     ? '☔ Haan, aaj chhata (umbrella) saath rakhein! Baarish hone ki sambhavna hai.'
@@ -224,31 +222,26 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
   let category = 'general';
   let speechText = '';
 
-  // 1. Umbrella Query
   if (q.includes('umbrella') || q.includes('chhata') || q.includes('chata') || q.includes('raincoat')) {
     category = 'umbrella';
     responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.`;
     speechText = carryUmbrella ? `${location} me baarish ki sambhavna hai. Chhata saath le jaana mat bhoolna.` : `${location} me aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.`;
   }
-  // 2. Weather query ("Aaj weather kaisa hai?" or specific place weather)
   else if (q.includes('kaisa') || q.includes('weather') || q.includes('mausam') || q.includes('today') || q.includes('aaj') || q.includes('how is')) {
     category = 'today';
     responseText = `📍 **${location}** ka live mausam report:\n\n• 🌡️ **Temperature:** ${temp}°C\n• 🌤️ **Sthiti:** ${conditionText}\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind Speed:** ${windSpeed} km/h\n\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Outside activities ke liye mausam acha hai.'}`;
     speechText = `${location} me abhi temperature ${temp} degree celsius hai. Mausam ${conditionText} hai aur baarish ki sambhavna ${rainProb} percent hai.`;
   }
-  // 3. Rain / Baarish Query
   else if (q.includes('baarish') || q.includes('barish') || q.includes('rain') || q.includes('kal') || q.includes('tomorrow')) {
     category = 'rain';
     responseText = `🌧️ **Rain Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Status: **${conditionText}**\n\n${rainProb > 45 ? '⚠️ High rain alert: Waterlogging aur traffic disruption se bachne ke liye tayyari rakhein.' : '✅ Abhi heavy rainfall ki badi warning nahi hai.'}`;
     speechText = `${location} me baarish ki sambhavna lagbhag ${rainProb} percent hai.`;
   }
-  // 4. Temperature query
   else if (q.includes('temp') || q.includes('temperature') || q.includes('garmi') || q.includes('sardi') || q.includes('thand')) {
     category = 'temperature';
     responseText = `🌡️ **Temperature Details for ${location}:**\n\n• Current Temp: **${temp}°C**\n• High expected: **${temp + 4}°C**\n• Low expected: **${temp - 4}°C**\n• RealFeel: **${temp + 2}°C**\n\n${temp > 35 ? '🔥 Garmi zyada hai, hydration banaye rakhein!' : temp < 15 ? '❄️ Thand hai, garm kapde pehno!' : '🌿 Mausam suhana hai.'}`;
     speechText = `${location} me abhi taapmaan ${temp} degree celsius hai.`;
   }
-  // 5. Alert query
   else if (q.includes('alert') || q.includes('warning') || q.includes('khatra')) {
     category = 'alert';
     if (isThunder) {
@@ -260,13 +253,11 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
     }
     speechText = `${location} me abhi koi severe warning active nahi hai.`;
   }
-  // 6. Hindi request
   else if (q.includes('hindi') || q.includes('हिंदी')) {
     category = 'hindi';
     responseText = `🇮🇳 **मौसम रिपोर्ट (${location}):**\n\n• तापमान: **${temp}°C**\n• स्थिति: **${conditionText}**\n• बारिश की संभावना: **${rainProb}%**\n• हवा की गति: **${windSpeed} किमी/घंटा**\n\n${carryUmbrella ? '👉 सलाह: छाता साथ रखें।' : '👉 सलाह: मौसम सुहावना है।'}`;
     speechText = `${location} mein vartaman tapman ${temp} degree celsius hai. Vrishti ki sambhavna ${rainProb} percent hai.`;
   }
-  // Default query
   else {
     responseText = `📍 **${location}** Weather Summary:\n\n• Temperature: **${temp}°C** (${conditionText})\n• Precipitation Chance: **${rainProb}%**\n• Humidity: **${humidity}%**\n\nAap inse judi jaankari pooch sakte hain:\n- "Aaj weather kaisa hai?"\n- "Should I carry an umbrella?"\n- "Mumbai me baarish hogi?"`;
     speechText = `${location} ka mausam abhi ${temp} degree celsius hai. Rain chance ${rainProb} percent hai.`;
@@ -291,7 +282,6 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
   const method = req.method;
 
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -340,7 +330,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Geocoding Search Endpoint (Supports Indian Cities/Districts & World Capitals)
+  // 3. Geocoding Search Endpoint (Prioritizes Indian Cities/Districts)
   if (pathname === '/api/geocoding' && method === 'GET') {
     const query = parsedUrl.query.q || '';
     if (!query) {
@@ -353,6 +343,10 @@ const server = http.createServer(async (req, res) => {
     
     try {
       const data = await fetchHttps(targetUrl);
+      if (data.results && data.results.length > 0) {
+        // Sort/prioritize Indian results first
+        data.results.sort((a, b) => (a.country === 'India' ? -1 : 1) - (b.country === 'India' ? -1 : 1));
+      }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(data));
     } catch (err) {
@@ -362,7 +356,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 4. AI Chat Processing Endpoint (Asynchronous NLP & Dynamic Weather Fetching)
+  // 4. AI Chat Processing Endpoint
   if (pathname === '/api/chat' && method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
