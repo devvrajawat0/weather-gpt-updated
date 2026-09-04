@@ -70,6 +70,69 @@
       "text": "Namaste! Main WeatherGPT hoon. Aaj main aapki weather, precipitation, aur climate info me kaise madad kar sakta hoon?",
       "time": "Just now",
       "lang": "hinglish"
+    },
+    {
+      "id": 1788540643743,
+      "sender": "user",
+      "text": "Dharamshala me weather kaisa hai?",
+      "time": "10:20 pm"
+    },
+    {
+      "id": 1788540643744,
+      "sender": "bot",
+      "text": "📍 **Dharamshala, Himachal Pradesh** ka live mausam report:\n\n• 🌡️ **Temperature:** 20°C (High: 25°C / Low: 20°C)\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Chance:** 22%\n• 💧 **Humidity:** 86%\n• 💨 **Wind Speed:** 0 km/h\n\n👉 👕 Comfortable casual clothes pehno.\n👉 Outside activities ke liye mausam acha hai.",
+      "speechText": "Dharamshala, Himachal Pradesh me abhi temperature 20 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 22 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 22,
+      "temperature": 20,
+      "maxTemp": 25,
+      "minTemp": 20,
+      "location": "Dharamshala, Himachal Pradesh",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "10:20 pm"
+    },
+    {
+      "id": 1788540760758,
+      "sender": "user",
+      "text": "Shimla me baraf giregi kya?",
+      "time": "10:22 pm"
+    },
+    {
+      "id": 1788540760759,
+      "sender": "bot",
+      "text": "📍 **Shimla, Himachal Pradesh** Weather Summary:\n\n• Temperature: **14°C** (Saaf Aakash (Clear Sky))\n• Max/Min: **21°C / 14°C**\n• Precipitation Chance: **1%**\n• Humidity: **99%**\n\nAap inse judi jaankari pooch sakte hain:\n- \"Aaj weather kaisa hai?\"\n- \"Mumbai me baarish hogi?\"\n- \"Shimla me baraf giregi kya?\"\n- \"Hindi mein weather batao\"",
+      "speechText": "Shimla, Himachal Pradesh ka mausam abhi 14 degree celsius hai. Rain chance 1 percent hai.",
+      "category": "general",
+      "umbrellaNeeded": false,
+      "rainProbability": 1,
+      "temperature": 14,
+      "maxTemp": 21,
+      "minTemp": 14,
+      "location": "Shimla, Himachal Pradesh",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "10:22 pm"
+    },
+    {
+      "id": 1788540775655,
+      "sender": "user",
+      "text": "Jaipur ka mausam kaisa hai?",
+      "time": "10:22 pm"
+    },
+    {
+      "id": 1788540775656,
+      "sender": "bot",
+      "text": "📍 **Jaipur, Rajasthan** ka live mausam report:\n\n• 🌡️ **Temperature:** 26°C (High: 29°C / Low: 25°C)\n• 🌤️ **Sthiti:** Baadal (Cloudy)\n• 🌧️ **Baarish Chance:** 20%\n• 💧 **Humidity:** 83%\n• 💨 **Wind Speed:** 5 km/h\n\n👉 👕 Comfortable casual clothes pehno.\n👉 Outside activities ke liye mausam acha hai.",
+      "speechText": "Jaipur, Rajasthan me abhi temperature 26 degree celsius hai. Mausam Baadal (Cloudy) hai aur baarish ki sambhavna 20 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 20,
+      "temperature": 26,
+      "maxTemp": 29,
+      "minTemp": 25,
+      "location": "Jaipur, Rajasthan",
+      "condition": "Baadal (Cloudy)",
+      "timestamp": "10:22 pm"
     }
   ]
 }

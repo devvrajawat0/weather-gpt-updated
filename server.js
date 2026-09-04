@@ -51,7 +51,7 @@ function writeDB(data) {
   }
 }
 
-// MASSIVE INDIAN GEOGRAPHY & CITIES KNOWLEDGE DATABASE (100+ Cities, Capitals, Districts & Hill Stations)
+// MASSIVE INDIAN GEOGRAPHY & CITIES KNOWLEDGE DATABASE
 const POPULAR_LOCATIONS = [
   // North India & Himalayas
   { name: "Delhi, India", lat: 28.6139, lon: 77.2090, keywords: ["delhi", "dilli", "ncr", "new delhi"] },
@@ -69,33 +69,23 @@ const POPULAR_LOCATIONS = [
   { name: "Chandigarh, UT", lat: 30.7333, lon: 76.7794, keywords: ["chandigarh"] },
   { name: "Amritsar, Punjab", lat: 31.6340, lon: 74.8723, keywords: ["amritsar"] },
   { name: "Ludhiana, Punjab", lat: 30.9010, lon: 75.8573, keywords: ["ludhiana"] },
-  { name: "Jalandhar, Punjab", lat: 31.3260, lon: 75.5762, keywords: ["jalandhar"] },
   { name: "Gurgaon (Gurugram), Haryana", lat: 28.4595, lon: 77.0266, keywords: ["gurgaon", "gurugram"] },
   { name: "Noida, UP", lat: 28.5355, lon: 77.3910, keywords: ["noida"] },
-  { name: "Ghaziabad, UP", lat: 28.6692, lon: 77.4538, keywords: ["ghaziabad"] },
 
   // West & Central India
   { name: "Mumbai, Maharashtra", lat: 19.0760, lon: 72.8777, keywords: ["mumbai", "bombay", "bandra", "andheri"] },
   { name: "Pune, Maharashtra", lat: 18.5204, lon: 73.8567, keywords: ["pune", "poona"] },
   { name: "Nagpur, Maharashtra", lat: 21.1458, lon: 79.0882, keywords: ["nagpur"] },
-  { name: "Nashik, Maharashtra", lat: 19.9975, lon: 73.7898, keywords: ["nashik", "nasik"] },
-  { name: "Thane, Maharashtra", lat: 19.2183, lon: 72.9781, keywords: ["thane"] },
-  { name: "Aurangabad, Maharashtra", lat: 19.8762, lon: 75.3433, keywords: ["aurangabad", "sambhajinagar"] },
+  { name: "Nashik, Maharashtra", lat: 19.9975, lon: 73.7898, keywords: ["nashik"] },
   { name: "Ahmedabad, Gujarat", lat: 23.0225, lon: 72.5714, keywords: ["ahmedabad", "amdavad"] },
   { name: "Surat, Gujarat", lat: 21.1702, lon: 72.8311, keywords: ["surat"] },
   { name: "Vadodara, Gujarat", lat: 22.3072, lon: 73.1812, keywords: ["vadodara", "baroda"] },
-  { name: "Rajkot, Gujarat", lat: 22.3039, lon: 70.8022, keywords: ["rajkot"] },
   { name: "Jaipur, Rajasthan", lat: 26.9124, lon: 75.7873, keywords: ["jaipur"] },
   { name: "Udaipur, Rajasthan", lat: 24.5854, lon: 73.7125, keywords: ["udaipur"] },
   { name: "Jodhpur, Rajasthan", lat: 26.2389, lon: 73.0243, keywords: ["jodhpur"] },
-  { name: "Kota, Rajasthan", lat: 25.2138, lon: 75.8648, keywords: ["kota"] },
-  { name: "Jaisalmer, Rajasthan", lat: 26.9157, lon: 70.9083, keywords: ["jaisalmer"] },
-  { name: "Ajmer, Rajasthan", lat: 26.4499, lon: 74.6399, keywords: ["ajmer"] },
   { name: "Bhopal, MP", lat: 23.2599, lon: 77.4126, keywords: ["bhopal"] },
   { name: "Indore, MP", lat: 22.7196, lon: 75.8577, keywords: ["indore"] },
   { name: "Gwalior, MP", lat: 26.2183, lon: 78.1828, keywords: ["gwalior"] },
-  { name: "Jabalpur, MP", lat: 23.1815, lon: 79.9864, keywords: ["jabalpur"] },
-  { name: "Ujjain, MP", lat: 23.1765, lon: 75.7885, keywords: ["ujjain"] },
   { name: "Panaji, Goa", lat: 15.4909, lon: 73.8278, keywords: ["goa", "panaji", "panjim"] },
 
   // East & North-East India
@@ -106,37 +96,24 @@ const POPULAR_LOCATIONS = [
   { name: "Prayagraj (Allahabad), UP", lat: 25.4358, lon: 81.8463, keywords: ["allahabad", "prayagraj"] },
   { name: "Kolkata, West Bengal", lat: 22.5726, lon: 88.3639, keywords: ["kolkata", "calcutta"] },
   { name: "Darjeeling, West Bengal", lat: 27.0410, lon: 88.2663, keywords: ["darjeeling"] },
-  { name: "Siliguri, West Bengal", lat: 26.7271, lon: 88.3953, keywords: ["siliguri"] },
   { name: "Patna, Bihar", lat: 25.5941, lon: 85.1376, keywords: ["patna"] },
-  { name: "Gaya, Bihar", lat: 24.7914, lon: 85.0002, keywords: ["gaya", "bodhgaya"] },
-  { name: "Muzaffarpur, Bihar", lat: 26.1209, lon: 85.3647, keywords: ["muzaffarpur"] },
   { name: "Ranchi, Jharkhand", lat: 23.3441, lon: 85.3096, keywords: ["ranchi"] },
-  { name: "Jamshedpur, Jharkhand", lat: 22.8046, lon: 86.2029, keywords: ["jamshedpur"] },
   { name: "Bhubaneswar, Odisha", lat: 20.2961, lon: 85.8245, keywords: ["bhubaneswar"] },
-  { name: "Puri, Odisha", lat: 19.8135, lon: 85.8312, keywords: ["puri"] },
-  { name: "Cuttack, Odisha", lat: 20.4625, lon: 85.8828, keywords: ["cuttack"] },
   { name: "Raipur, Chhattisgarh", lat: 21.2514, lon: 81.6296, keywords: ["raipur"] },
   { name: "Guwahati, Assam", lat: 26.1445, lon: 91.7362, keywords: ["guwahati"] },
-  { name: "Shillong, Meghalaya", lat: 25.5788, lon: 91.8933, keywords: ["shillong", "cherrapunji"] },
+  { name: "Shillong, Meghalaya", lat: 25.5788, lon: 91.8933, keywords: ["shillong"] },
   { name: "Gangtok, Sikkim", lat: 27.3389, lon: 88.6065, keywords: ["gangtok"] },
-  { name: "Imphal, Manipur", lat: 24.8170, lon: 93.9368, keywords: ["imphal"] },
-  { name: "Agartala, Tripura", lat: 23.8315, lon: 91.2868, keywords: ["agartala"] },
 
   // South India
   { name: "Bangalore (Bengaluru), Karnataka", lat: 12.9716, lon: 77.5946, keywords: ["bangalore", "bengaluru"] },
-  { name: "Mysore, Karnataka", lat: 12.2958, lon: 76.6394, keywords: ["mysore", "mysuru"] },
-  { name: "Mangalore, Karnataka", lat: 12.9141, lon: 74.8560, keywords: ["mangalore", "mangaluru"] },
+  { name: "Mysore, Karnataka", lat: 12.2958, lon: 76.6394, keywords: ["mysore"] },
   { name: "Chennai, Tamil Nadu", lat: 13.0827, lon: 80.2707, keywords: ["chennai", "madras"] },
   { name: "Coimbatore, Tamil Nadu", lat: 11.0168, lon: 76.9558, keywords: ["coimbatore"] },
-  { name: "Madurai, Tamil Nadu", lat: 9.9252, lon: 78.1198, keywords: ["madurai"] },
   { name: "Ooty, Tamil Nadu", lat: 11.4102, lon: 76.6950, keywords: ["ooty"] },
   { name: "Hyderabad, Telangana", lat: 17.3850, lon: 78.4867, keywords: ["hyderabad"] },
   { name: "Visakhapatnam, AP", lat: 17.6868, lon: 83.2185, keywords: ["visakhapatnam", "vizag"] },
-  { name: "Vijayawada, AP", lat: 16.5062, lon: 80.6480, keywords: ["vijayawada"] },
-  { name: "Tirupati, AP", lat: 13.6288, lon: 79.4192, keywords: ["tirupati"] },
   { name: "Kochi, Kerala", lat: 9.9312, lon: 76.2673, keywords: ["kochi", "cochin"] },
-  { name: "Thiruvananthapuram, Kerala", lat: 8.5241, lon: 76.9366, keywords: ["trivandrum", "thiruvananthapuram"] },
-  { name: "Munnar, Kerala", lat: 10.0889, lon: 77.0595, keywords: ["munnar"] }
+  { name: "Thiruvananthapuram, Kerala", lat: 8.5241, lon: 76.9366, keywords: ["trivandrum", "thiruvananthapuram"] }
 ];
 
 // Smart Location Extractor from User Question
@@ -168,7 +145,7 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
 
   // 3. Search via Open-Meteo Geocoding API if unknown city mentioned
   if (!targetLocation) {
-    const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry", "best", "visit", "trip", "going", "to"];
+    const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry", "best", "visit", "trip", "going", "to", "pehne", "kapde", "clothing", "dress", "suggest", "outfit"];
     
     const match = q.match(/(?:in|me|at|near|ka|ki|for|to)\s+([a-z\s]+)/i);
     let candidateWord = null;
@@ -191,7 +168,6 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
           const placeName = `${indianResult.name}${indianResult.admin1 ? ', ' + indianResult.admin1 : ''}${indianResult.country ? ', ' + indianResult.country : ''}`;
           targetLocation = { name: placeName, lat: indianResult.latitude, lon: indianResult.longitude };
 
-          // Cache new location in DB
           db.savedLocations = db.savedLocations || [];
           if (!db.savedLocations.some(l => l.name === placeName)) {
             db.savedLocations.push({ name: placeName, lat: indianResult.latitude, lon: indianResult.longitude, type: 'District', country: indianResult.country || 'India' });
@@ -215,13 +191,14 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
 
   // Fetch live weather data for the target location
   try {
-    const weatherRes = await fetchHttps(`https://api.open-meteo.com/v1/forecast?latitude=${targetLocation.lat}&longitude=${targetLocation.lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&daily=precipitation_probability_max,temperature_2m_max,temperature_2m_min&timezone=auto`);
+    const weatherRes = await fetchHttps(`https://api.open-meteo.com/v1/forecast?latitude=${targetLocation.lat}&longitude=${targetLocation.lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&daily=precipitation_probability_max,temperature_2m_max,temperature_2m_min,uv_index_max&timezone=auto`);
     
     const cur = weatherRes.current_weather || {};
     const rainProb = weatherRes.hourly && weatherRes.hourly.precipitation_probability ? weatherRes.hourly.precipitation_probability[0] || 10 : 10;
     const humidity = weatherRes.hourly && weatherRes.hourly.relativehumidity_2m ? weatherRes.hourly.relativehumidity_2m[0] || 60 : 60;
     const maxTemp = weatherRes.daily && weatherRes.daily.temperature_2m_max ? Math.round(weatherRes.daily.temperature_2m_max[0]) : Math.round(cur.temperature + 4);
     const minTemp = weatherRes.daily && weatherRes.daily.temperature_2m_min ? Math.round(weatherRes.daily.temperature_2m_min[0]) : Math.round(cur.temperature - 4);
+    const uvIndex = weatherRes.daily && weatherRes.daily.uv_index_max ? Math.round(weatherRes.daily.uv_index_max[0]) : 5;
 
     return {
       locationName: targetLocation.name,
@@ -232,6 +209,7 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
       windSpeed: cur.windspeed !== undefined ? Math.round(cur.windspeed) : 12,
       rainProb: rainProb,
       humidity: humidity,
+      uvIndex: uvIndex,
       aqi: defaultContext.aqi || 45
     };
   } catch (err) {
@@ -245,9 +223,41 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
       windSpeed: 12,
       rainProb: 15,
       humidity: 60,
+      uvIndex: 5,
       aqi: 45
     };
   }
+}
+
+// ENHANCED CLOTHING & OUTFIT ADVISORY ENGINE
+function generateClothingRecommendation(temp, rainProb, humidity, uvIndex, weatherCode) {
+  let advice = [];
+  let isRainy = rainProb > 40 || [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weatherCode);
+  let isSnowy = [71, 73, 75, 77, 85, 86].includes(weatherCode);
+
+  // 1. Temperature-based Clothing
+  if (temp >= 35) {
+    advice.push("👕 **Garmi Advice:** Dhile light-colored cotton shirt/t-shirt aur breathable trousers pehne.");
+    advice.push("🕶️ Direct dhoop se bachne ke liye sunglasses, cap, aur SPF 30+ sunscreen lagayein.");
+  } else if (temp >= 28 && temp < 35) {
+    advice.push("👕 **Warm Weather:** Lightweight cotton clothing best rahegi.");
+    if (humidity > 70) {
+      advice.push("💧 High humidity hai, moisture-wicking fabric pehne taaki pasine se rahat mile.");
+    }
+  } else if (temp >= 20 && temp < 28) {
+    advice.push("👕 **Pleasant Mausam:** Comfortable casualwear (T-shirt, jeans, light cotton shirt) pehne. Outdoor activities ke liye perfect mausam hai.");
+  } else if (temp >= 12 && temp < 20) {
+    advice.push("🧥 **Thand / Chilly:** Light sweater, denim jacket, ya hoodie pehne. Shaam aur subah thand badh sakti hai.");
+  } else if (temp < 12 || isSnowy) {
+    advice.push("🧥 **Coldwave / Severe Cold:** Heavy woolen jacket, thermals, muffler, aur gloves pehne. Apne aap ko garm rakhein.");
+  }
+
+  // 2. Rain & Footwear Advisory
+  if (isRainy) {
+    advice.push("☔ **Rain & Footwear:** Waterproof jacket/raincoat aur water-resistant sandals/crocs pehne. Heavy denim ya thick cotton se bachein jo geela hone par sukhne me time leta hai.");
+  }
+
+  return advice.join("\n");
 }
 
 // AI Engine for Multilingual Chat Processing
@@ -266,6 +276,7 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
   const aqi = weatherContext.aqi;
   const humidity = weatherContext.humidity;
   const windSpeed = weatherContext.windSpeed;
+  const uvIndex = weatherContext.uvIndex;
 
   let conditionText = 'Saaf Aakash (Clear Sky)';
   let isRainy = rainProb > 40 || [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weatherCode);
@@ -283,33 +294,43 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
     ? '☔ Haan, aaj chhata (umbrella) saath rakhein! Baarish hone ki sambhavna hai.'
     : '☀️ Nahin, aaj chhata ki zarurat nahi hai. Mausam saaf rahne ki ummeed hai.';
 
+  const clothingAdvice = generateClothingRecommendation(temp, rainProb, humidity, uvIndex, weatherCode);
+
   let responseText = '';
   let category = 'general';
   let speechText = '';
 
-  // Outfit & Travel Suggestion Engine
-  let outfitTip = temp > 32 ? '👕 Light cotton clothes pehno, garmi zyada hai.' : temp < 18 ? '🧥 Woolen jacket ya sweater pehno, thand hai.' : '👕 Comfortable casual clothes pehno.';
-
-  if (q.includes('umbrella') || q.includes('chhata') || q.includes('chata') || q.includes('raincoat')) {
+  // Intent 1: Clothing / Dress / Outfit Query ("Aaj kya pehne?", "Clothing suggestion")
+  if (q.includes('pehne') || q.includes('pehna') || q.includes('kapde') || q.includes('clothing') || q.includes('dress') || q.includes('outfit') || q.includes('wear')) {
+    category = 'clothing';
+    responseText = `👗 **Clothing & Outfit Suggestion for ${location}:**\n\n📍 **Current Weather:** ${temp}°C (${conditionText}) | Rain: ${rainProb}%\n\n${clothingAdvice}\n\n${carryUmbrella ? '👉 Chhata ya raincoat saath le jaana mat bhoolna.' : ''}`;
+    speechText = `${location} me abhi temperature ${temp} degree celsius hai. ${clothingAdvice.replace(/[*#]/g, '')}`;
+  }
+  // Intent 2: Umbrella Query
+  else if (q.includes('umbrella') || q.includes('chhata') || q.includes('chata') || q.includes('raincoat')) {
     category = 'umbrella';
-    responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.\n👉 ${outfitTip}`;
+    responseText = `${umbrellaAdvice}\n\n📍 **${location}** me rain probability **${rainProb}%** hai aur temperature **${temp}°C** hai.\n\n👔 **Outfit Advice:**\n${clothingAdvice}`;
     speechText = carryUmbrella ? `${location} me baarish ki sambhavna hai. Chhata saath le jaana mat bhoolna.` : `${location} me aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.`;
   }
+  // Intent 3: Weather query ("Aaj weather kaisa hai?")
   else if (q.includes('kaisa') || q.includes('weather') || q.includes('mausam') || q.includes('today') || q.includes('aaj') || q.includes('how is')) {
     category = 'today';
-    responseText = `📍 **${location}** ka live mausam report:\n\n• 🌡️ **Temperature:** ${temp}°C (High: ${maxTemp}°C / Low: ${minTemp}°C)\n• 🌤️ **Sthiti:** ${conditionText}\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind Speed:** ${windSpeed} km/h\n\n👉 ${outfitTip}\n${carryUmbrella ? '👉 Chhata saath me rakhein.' : '👉 Outside activities ke liye mausam acha hai.'}`;
+    responseText = `📍 **${location}** ka live mausam report:\n\n• 🌡️ **Temperature:** ${temp}°C (Max: ${maxTemp}°C / Min: ${minTemp}°C)\n• 🌤️ **Sthiti:** ${conditionText}\n• 🌧️ **Baarish Chance:** ${rainProb}%\n• 💧 **Humidity:** ${humidity}%\n• 💨 **Wind Speed:** ${windSpeed} km/h\n\n👔 **Clothing Advice:**\n${clothingAdvice}`;
     speechText = `${location} me abhi temperature ${temp} degree celsius hai. Mausam ${conditionText} hai aur baarish ki sambhavna ${rainProb} percent hai.`;
   }
+  // Intent 4: Rain / Monsoon Query
   else if (q.includes('baarish') || q.includes('barish') || q.includes('rain') || q.includes('kal') || q.includes('tomorrow') || q.includes('monsoon')) {
     category = 'rain';
-    responseText = `🌧️ **Rain & Monsoon Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Condition: **${conditionText}**\n• Max Temp: **${maxTemp}°C**\n\n${rainProb > 45 ? '⚠️ Heavy rain advisory: Waterlogging aur traffic disruption se bachne ke liye raincoat/umbrella tayyar rakhein.' : '✅ Abhi severe rainfall ki badi warning nahi hai.'}`;
+    responseText = `🌧️ **Rain & Monsoon Forecast for ${location}:**\n\n• Live Rain Chance: **${rainProb}%**\n• Condition: **${conditionText}**\n• Expected High: **${maxTemp}°C**\n\n${rainProb > 45 ? '⚠️ Heavy rain advisory: Waterlogging aur traffic disruption se bachne ke liye raincoat/umbrella tayyar rakhein.' : '✅ Abhi heavy rainfall ki badi warning nahi hai.'}\n\n👔 **Footwear & Outfit:**\n${clothingAdvice}`;
     speechText = `${location} me baarish ki sambhavna lagbhag ${rainProb} percent hai.`;
   }
+  // Intent 5: Temperature query
   else if (q.includes('temp') || q.includes('temperature') || q.includes('garmi') || q.includes('sardi') || q.includes('thand')) {
     category = 'temperature';
-    responseText = `🌡️ **Temperature Details for ${location}:**\n\n• Current Temp: **${temp}°C**\n• Expected High: **${maxTemp}°C**\n• Expected Low: **${minTemp}°C**\n• RealFeel: **${temp + 2}°C**\n\n${temp > 35 ? '🔥 High temperature alert! Paani pite rahein aur direct dhoop se bachein.' : temp < 15 ? '❄️ Coldwave advisory! Garm kapde pehno.' : '🌿 Mausam suhana aur anukool hai.'}`;
+    responseText = `🌡️ **Temperature Details for ${location}:**\n\n• Current Temp: **${temp}°C**\n• Expected High: **${maxTemp}°C**\n• Expected Low: **${minTemp}°C**\n• RealFeel: **${temp + 2}°C**\n\n👔 **Outfit Advisory:**\n${clothingAdvice}`;
     speechText = `${location} me abhi taapmaan ${temp} degree celsius hai. Max temperature ${maxTemp} degree rahega.`;
   }
+  // Intent 6: Weather Alert
   else if (q.includes('alert') || q.includes('warning') || q.includes('khatra') || q.includes('cyclone') || q.includes('storm')) {
     category = 'alert';
     if (isThunder) {
@@ -321,13 +342,15 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
     }
     speechText = `${location} me abhi koi severe warning active nahi hai.`;
   }
+  // Intent 7: Hindi request
   else if (q.includes('hindi') || q.includes('हिंदी')) {
     category = 'hindi';
-    responseText = `🇮🇳 **मौसम रिपोर्ट (${location}):**\n\n• वर्तमान तापमान: **${temp}°C** (अधिकतम: ${maxTemp}°C / न्यूनतम: ${minTemp}°C)\n• मौसम स्थिति: **${conditionText}**\n• बारिश की संभावना: **${rainProb}%**\n• हवा की गति: **${windSpeed} किमी/घंटा**\n\n${carryUmbrella ? '👉 सलाह: बाहर जाते समय छाता साथ रखें।' : '👉 सलाह: मौसम सुहावना है।'}`;
+    responseText = `🇮🇳 **मौसम रिपोर्ट (${location}):**\n\n• वर्तमान तापमान: **${temp}°C** (अधिकतम: ${maxTemp}°C / न्यूनतम: ${minTemp}°C)\n• मौसम स्थिति: **${conditionText}**\n• बारिश की संभावना: **${rainProb}%**\n• हवा की गति: **${windSpeed} किमी/घंटा**\n\n👔 **कपड़ों की सलाह:**\n${clothingAdvice}\n\n${carryUmbrella ? '👉 सलाह: बाहर जाते समय छाता साथ रखें।' : '👉 सलाह: मौसम सुहावना है।'}`;
     speechText = `${location} mein vartaman tapman ${temp} degree celsius hai. Vrishti ki sambhavna ${rainProb} percent hai.`;
   }
+  // Default query
   else {
-    responseText = `📍 **${location}** Weather Summary:\n\n• Temperature: **${temp}°C** (${conditionText})\n• Max/Min: **${maxTemp}°C / ${minTemp}°C**\n• Precipitation Chance: **${rainProb}%**\n• Humidity: **${humidity}%**\n\nAap inse judi jaankari pooch sakte hain:\n- "Aaj weather kaisa hai?"\n- "Mumbai me baarish hogi?"\n- "Shimla me baraf giregi kya?"\n- "Hindi mein weather batao"`;
+    responseText = `📍 **${location}** Weather Summary:\n\n• Temperature: **${temp}°C** (${conditionText})\n• Max/Min: **${maxTemp}°C / ${minTemp}°C**\n• Precipitation Chance: **${rainProb}%**\n\n👔 **Outfit Advice:**\n${clothingAdvice}\n\nAap inse judi jaankari pooch sakte hain:\n- "Aaj kya pehne? (Clothing Advice)"\n- "Chhata saath rakhein ya nahi?"\n- "Mumbai me baarish hogi?"`;
     speechText = `${location} ka mausam abhi ${temp} degree celsius hai. Rain chance ${rainProb} percent hai.`;
   }
 
@@ -340,6 +363,7 @@ async function processWeatherGPTChat(query, defaultContext = {}, language = 'hin
     temperature: temp,
     maxTemp: maxTemp,
     minTemp: minTemp,
+    clothingAdvice: clothingAdvice,
     location: location,
     condition: conditionText,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
