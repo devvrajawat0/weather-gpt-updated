@@ -1,0 +1,120 @@
+{
+  "settings": {
+    "language": "hinglish",
+    "unit": "celsius",
+    "theme": "dynamic",
+    "voiceEnabled": true,
+    "notifications": true
+  },
+  "savedLocations": [
+    {
+      "name": "New Delhi, India",
+      "lat": 28.6139,
+      "lon": 77.209,
+      "type": "Capital",
+      "country": "India"
+    },
+    {
+      "name": "Mumbai Tehsil, Maharashtra",
+      "lat": 19.076,
+      "lon": 72.8777,
+      "type": "Tehsil/District",
+      "country": "India"
+    },
+    {
+      "name": "Lucknow Tehsil, UP",
+      "lat": 26.8467,
+      "lon": 80.9462,
+      "type": "Tehsil/District",
+      "country": "India"
+    },
+    {
+      "name": "Shimla Tehsil, Himachal Pradesh",
+      "lat": 31.1048,
+      "lon": 77.1734,
+      "type": "Tehsil/District",
+      "country": "India"
+    },
+    {
+      "name": "Tokyo",
+      "lat": 35.6762,
+      "lon": 139.6503,
+      "type": "World Capital",
+      "country": "Japan"
+    },
+    {
+      "name": "London",
+      "lat": 51.5074,
+      "lon": -0.1278,
+      "type": "World Capital",
+      "country": "United Kingdom"
+    }
+  ],
+  "customAlerts": [
+    {
+      "id": 1,
+      "condition": "Rain Probability > 60%",
+      "location": "Current Location",
+      "active": true
+    },
+    {
+      "id": 2,
+      "condition": "Temperature > 40°C",
+      "location": "Current Location",
+      "active": true
+    },
+    {
+      "id": 3,
+      "condition": "AQI > 200 (Poor)",
+      "location": "Current Location",
+      "active": true
+    }
+  ],
+  "chatHistory": [
+    {
+      "id": 1,
+      "sender": "bot",
+      "text": "Namaste! Main WeatherGPT hoon. Aaj main aapki weather, precipitation, aur climate info me kaise madad kar sakta hoon?",
+      "time": "Just now",
+      "lang": "hinglish"
+    },
+    {
+      "id": 1788524334909,
+      "sender": "user",
+      "text": "Aaj weather kaisa hai?",
+      "time": "05:48 pm"
+    },
+    {
+      "id": 1788524334910,
+      "sender": "bot",
+      "text": "📍 **Aapki location** ka aaj ka mausam:\n\n• 🌡️ **Temperature:** 28°C\n• 🌤️ **Sthiti:** Saaf Aakash (Clear Sky)\n• 🌧️ **Baarish Probability:** 10%\n• 💧 **Humidity:** 60%\n• 💨 **Wind Speed:** 12 km/h\n\n👉 Din me outdoor activities ke liye mausam badhiya hai.",
+      "speechText": "Aapki location me abhi temperature 28 degree celsius hai. Mausam Saaf Aakash (Clear Sky) hai aur baarish ki sambhavna 10 percent hai.",
+      "category": "today",
+      "umbrellaNeeded": false,
+      "rainProbability": 10,
+      "temperature": 28,
+      "location": "Aapki location",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "05:48 pm"
+    },
+    {
+      "id": 1788524340001,
+      "sender": "user",
+      "text": "Should I carry an umbrella?",
+      "time": "05:49 pm"
+    },
+    {
+      "id": 1788524340002,
+      "sender": "bot",
+      "text": "☀️ Nahin, aaj chhata ki zarurat nahi hai. Mausam saaf rahne ki ummeed hai.\n\n📍 **Aapki location** me rain probability abhi **10%** hai aur temperature **28°C** hai.",
+      "speechText": "Nahi, aaj chhata le jaane ki zaroorat nahi hai. Aakash saaf hai.",
+      "category": "umbrella",
+      "umbrellaNeeded": false,
+      "rainProbability": 10,
+      "temperature": 28,
+      "location": "Aapki location",
+      "condition": "Saaf Aakash (Clear Sky)",
+      "timestamp": "05:49 pm"
+    }
+  ]
+}
