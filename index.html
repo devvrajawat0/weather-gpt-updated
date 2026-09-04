@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeatherGPT - Conversational AI for Weather Forecasting, Alerts & Climate (SIH26068)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col relative selection:bg-sky-500 selection:text-white">
+
+  <!-- DYNAMIC WEATHER ANIMATION CANVAS -->
+  <canvas id="weather-canvas"></canvas>
+
+  <!-- TOP NAVIGATION BAR (Desktop & Mobile) -->
+  <header class="sticky top-0 z-40 glass-nav border-b border-slate-800/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-3 cursor-pointer" data-screen="dashboard">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 border border-sky-400/30">
+        <i data-lucide="cloud-lightning" class="w-6 h-6 text-white animate-pulse"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-black text-lg md:text-xl tracking-tight bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent">WeatherGPT</span>
+          <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">SIH26068</span>
+        </div>
+        <div class="text-[11px] text-slate-400 font-medium hidden sm:block">Conversational AI Weather Engine</div>
+      </div>
+    </div>
+
+    <!-- Desktop Screen Links -->
+    <nav class="hidden md:flex items-center gap-1 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800">
+      <a href="#" data-screen="dashboard" class="nav-link active px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+      </a>
+      <a href="#" data-screen="chat" class="nav-link px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-white transition-all">
+        <i data-lucide="bot" class="w-4 h-4 text-sky-400"></i> AI Chat
+      </a>
+      <a href="#" data-screen="forecast" class="nav-link px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-white transition-all">
+        <i data-lucide="calendar-days" class="w-4 h-4"></i> Forecast
+      </a>
+      <a href="#" data-screen="alerts" class="nav-link px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-white transition-all">
+        <i data-lucide="triangle-alert" class="w-4 h-4 text-amber-400"></i> Alerts
+      </a>
+      <a href="#" data-screen="climate" class="nav-link px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-white transition-all">
+        <i data-lucide="wind" class="w-4 h-4 text-emerald-400"></i> Climate & AQI
+      </a>
+      <a href="#" data-screen="settings" class="nav-link px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-slate-400 hover:text-white transition-all">
+        <i data-lucide="sliders" class="w-4 h-4"></i> Settings
+      </a>
+    </nav>
+
+    <!-- Right Header Controls -->
+    <div class="flex items-center gap-3">
+      <!-- Device GPS Location Button -->
+      <button id="current-geo-btn" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-sky-400 border border-slate-700/80 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Use Device Live Location">
+        <i data-lucide="crosshair" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">My Location</span>
+      </button>
+
+      <!-- Launch Countdown Badge -->
+      <div id="completion-countdown-timer"></div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER FOR ALL 6 SCREENS -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 space-y-8 relative z-10 pb-24 md:pb-8">
+
+    <!-- GLOBAL LOADING SPINNER -->
+    <div id="global-spinner" class="hidden fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex flex-col items-center justify-center gap-3">
+      <div class="w-12 h-12 border-4 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs font-semibold tracking-wider text-sky-300 animate-pulse">FETCHING LIVE WEATHER DATA...</p>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: HOME / DASHBOARD                 -->
+    <!-- ========================================== -->
+    <section id="screen-dashboard" class="screen-view space-y-6">
+      
+      <!-- Top Search Bar & Featured Locations Bar -->
+      <div class="glass-card p-4 md:p-6 rounded-3xl relative">
+        <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+          
+          <!-- Search Input with Auto-complete -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="dash-search-input" placeholder="Search any city or location in India or Worldwide (e.g. Mumbai, Lucknow, Shimla, Tokyo, London)..." 
+              class="w-full glass-input pl-12 pr-4 py-3.5 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
+          </div>
+
+          <!-- Featured Location Chips -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none text-xs">
+            <span class="text-slate-400 font-semibold text-[11px] whitespace-nowrap">Popular:</span>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(19.0760, 72.8777, 'Mumbai, Maharashtra')">📍 Mumbai</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(26.8467, 80.9462, 'Lucknow, UP')">📍 Lucknow</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(31.1048, 77.1734, 'Shimla, HP')">📍 Shimla</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 whitespace-nowrap font-medium transition-all" onclick="window.AppState.fetchWeatherData(35.6762, 139.6503, 'Tokyo, Japan')">🌐 Tokyo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Weather Card & Umbrella Advisory Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Main Live Weather Hero Card -->
+        <div class="lg:col-span-2 glass-card p-6 md:p-8 rounded-3xl flex flex-col justify-between relative overflow-hidden group">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-2 text-sky-400 font-semibold text-xs tracking-wider uppercase mb-1">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                <span id="dash-location-name">Detecting Location...</span>
+              </div>
+              <h2 id="dash-condition-text" class="text-2xl md:text-3xl font-extrabold text-white">Clear Sky (Saaf Aakash)</h2>
+            </div>
+            
+            <div class="floating-anim">
+              <i data-lucide="sun" class="w-16 h-16 md:w-20 md:h-20 text-amber-400 drop-shadow-[0_0_20px_rgba(245,158,11,0.5)]"></i>
+            </div>
+          </div>
+
+          <!-- Main Temperature Display -->
+          <div class="my-6">
+            <div id="dash-temp-main" class="text-6xl md:text-8xl font-black text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text tracking-tighter">--°C</div>
+            <p class="text-xs md:text-sm text-slate-400 mt-1">Live data powered by Open-Meteo High Precision API</p>
+          </div>
+
+          <!-- Bottom Metrics Bar -->
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80">
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl bg-blue-500/10 text-sky-400 border border-blue-500/20">
+                <i data-lucide="droplets" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-semibold uppercase">Humidity</div>
+                <div id="dash-humidity" class="text-sm md:text-base font-bold text-slate-100">--%</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <i data-lucide="wind" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-semibold uppercase">Wind</div>
+                <div id="dash-wind" class="text-sm md:text-base font-bold text-slate-100">-- km/h</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="p-2.5 rounded-xl bg-sky-500/10 text-sky-300 border border-sky-500/20">
+                <i data-lucide="cloud-rain" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-semibold uppercase">Rain Prob</div>
+                <div id="dash-rain-prob" class="text-sm md:text-base font-bold text-sky-300">--%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick AI Umbrella & Conversational Assistant Sidebar -->
+        <div class="glass-card p-6 rounded-3xl flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i> AI Smart Insights
+              </h3>
+              <span class="text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Active</span>
+            </div>
+
+            <!-- Umbrella Advisory Card -->
+            <div id="dash-umbrella-badge">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Prompt Shortcuts -->
+            <div class="space-y-2">
+              <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ask Location Weather:</div>
+              <div class="space-y-2">
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Mumbai me weather kaisa hai?" onclick="window.AppState.switchScreen('chat')">
+                  <span>🌊 "Mumbai me weather kaisa hai?"</span>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Should I carry an umbrella in Lucknow?" onclick="window.AppState.switchScreen('chat')">
+                  <span>☔ "Should I carry umbrella in Lucknow?"</span>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <button class="chat-prompt-pill w-full text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-xs font-medium text-slate-200 flex items-center justify-between group transition-all" data-prompt="Shimla me baraf giregi kya?" onclick="window.AppState.switchScreen('chat')">
+                  <span>❄️ "Shimla me baraf giregi kya?"</span>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open AI Chat Full Button -->
+          <button onclick="window.AppState.switchScreen('chat')" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2 transition-all">
+            <i data-lucide="message-square" class="w-4 h-4"></i> Open WeatherGPT Chat Engine
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: AI CHAT (WEATHERGPT CONVERSATIONAL) -->
+    <!-- ========================================== -->
+    <section id="screen-chat" class="screen-view hidden space-y-6">
+      <div class="glass-card rounded-3xl flex flex-col h-[78vh] overflow-hidden border border-slate-800">
+        
+        <!-- Chat Header -->
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+              <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-100 text-base">WeatherGPT AI Assistant</h3>
+              <p class="text-xs text-sky-400 font-medium">Smart NLP • Dynamic Place Weather Fetching & Database Cache</p>
+            </div>
+          </div>
+
+          <!-- Voice Synthesis TTS Controls -->
+          <div class="flex items-center gap-2">
+            <button id="tts-toggle-btn" class="p-2.5 rounded-xl bg-blue-600 text-white border border-blue-400/30 transition-all flex items-center gap-1.5 text-xs font-semibold" title="Toggle Voice Readout">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+              <span class="hidden md:inline">Voice TTS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages History Container -->
+        <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-4">
+          <!-- Initial Welcome Message -->
+          <div class="flex w-full mb-4 justify-start">
+            <div class="flex gap-3 max-w-[85%]">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+              </div>
+              <div class="chat-bubble-bot px-4 py-3 text-sm md:text-base leading-relaxed">
+                <p>Namaste! Main <strong class="text-sky-300 font-semibold">WeatherGPT</strong> hoon. Aap kisi bhi jagah (jaise <em>"Mumbai me weather kaisa hai?"</em>, <em>"Is it raining in London?"</em>, <em>"Shimla temperature"</em>) ka mausam pooch sakte hain!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Query Chips Bar -->
+        <div class="px-4 py-2.5 bg-slate-900/90 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none text-xs">
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Mumbai me weather kaisa hai?">🌊 Mumbai weather?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Lucknow me kal baarish hogi?">🌧️ Lucknow rain?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Should I carry an umbrella?">☔ Carry umbrella?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Shimla me temperature kya hai?">❄️ Shimla temp?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Is it sunny in London?">🌐 London sunny?</button>
+          <button class="chat-prompt-pill px-3 py-1.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 font-medium" data-prompt="Hindi mein weather batao">🇮🇳 Hindi mein batao</button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="p-4 bg-slate-950 border-t border-slate-800 flex items-center gap-3">
+          <button id="mic-input-btn" class="p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all shrink-0" title="Voice Input">
+            <i data-lucide="mic" class="w-5 h-5 text-sky-400"></i>
+          </button>
+          <input type="text" id="chat-input-text" placeholder="Ask weather for ANY city or place (e.g. 'Mumbai me baarish hogi?', 'London temperature')..." 
+            class="flex-1 glass-input px-4 py-3 rounded-2xl text-sm placeholder:text-slate-500 font-medium">
+          <button id="chat-send-btn" class="p-3 px-5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2 transition-all shrink-0">
+            <span>Send</span>
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 3: WEATHER FORECAST                 -->
+    <!-- ========================================== -->
+    <section id="screen-forecast" class="screen-view hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white">Weather Forecast & Timeline</h2>
+          <p class="text-xs text-slate-400">Hourly predictions and 7-day extended forecast</p>
+        </div>
+      </div>
+
+      <!-- 24-Hour Timeline Horizontal Slider -->
+      <div class="space-y-3">
+        <h3 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+          <i data-lucide="clock" class="w-4 h-4 text-sky-400"></i> 24-Hour Hourly Timeline
+        </h3>
+        <div id="hourly-cards-container" class="flex items-center gap-3 overflow-x-auto pb-4 scrollbar-thin">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Interactive Temperature & Rain Trend Chart -->
+      <div class="glass-card p-6 rounded-3xl space-y-4">
+        <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+          <i data-lucide="line-chart" class="w-4 h-4 text-amber-400"></i> Temperature & Precipitation Trend
+        </h3>
+        <div class="h-64 md:h-80 w-full">
+          <canvas id="forecast-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- 7-Day Extended Forecast Cards List -->
+      <div class="space-y-3">
+        <h3 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+          <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i> 7-Day Extended Outlook
+        </h3>
+        <div id="daily-cards-container" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 4: WEATHER ALERTS                   -->
+    <!-- ========================================== -->
+    <section id="screen-alerts" class="screen-view hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <i data-lucide="triangle-alert" class="w-6 h-6 text-amber-400"></i> Live Weather Alerts & Safety
+          </h2>
+          <p class="text-xs text-slate-400">Real-time emergency disaster and severe weather warnings</p>
+        </div>
+      </div>
+
+      <!-- Severe Weather Alert Cards List -->
+      <div id="weather-alerts-list" class="space-y-4">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- Custom Alert Threshold Creator -->
+      <div class="glass-card p-6 rounded-3xl space-y-4">
+        <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+          <i data-lucide="bell-plus" class="w-5 h-5 text-sky-400"></i> Configure Custom Threshold Alert
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Trigger Condition</label>
+            <select class="w-full glass-input px-3 py-2.5 rounded-xl text-xs font-medium">
+              <option>Rain Probability > 60%</option>
+              <option>Temperature > 40°C</option>
+              <option>AQI Index > 200 (Poor)</option>
+              <option>Wind Speed > 30 km/h</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">Notification Channel</label>
+            <select class="w-full glass-input px-3 py-2.5 rounded-xl text-xs font-medium">
+              <option>Browser In-App Banner</option>
+              <option>SMS Simulation</option>
+              <option>WeatherGPT Voice Alert</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="alert('Custom Alert Trigger successfully saved to Database!')" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all">
+              Save Custom Alert
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 5: CLIMATE & AQI INFORMATION        -->
+    <!-- ========================================== -->
+    <section id="screen-climate" class="screen-view hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <i data-lucide="wind" class="w-6 h-6 text-emerald-400"></i> Climate & Air Quality Intelligence
+          </h2>
+          <p class="text-xs text-slate-400">Real-time AQI pollutant breakdown and environmental advice</p>
+        </div>
+      </div>
+
+      <!-- Main AQI Gauge Card -->
+      <div class="glass-card p-6 md:p-8 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div class="space-y-4">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Air Quality Index (US AQI)</div>
+          <div class="flex items-baseline gap-4">
+            <div id="aqi-value-main" class="text-6xl font-black text-emerald-400">48</div>
+            <div id="aqi-status-text" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Good 😊</div>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">Air quality is considered satisfactory, and air pollution poses little or no risk for outdoor exercise.</p>
+        </div>
+
+        <!-- Pollutants Grid -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60">
+            <div class="text-slate-400 font-semibold text-[10px] uppercase">PM2.5</div>
+            <div id="aqi-pm25" class="font-bold text-sm text-slate-100">18 µg/m³</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60">
+            <div class="text-slate-400 font-semibold text-[10px] uppercase">PM10</div>
+            <div id="aqi-pm10" class="font-bold text-sm text-slate-100">35 µg/m³</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60">
+            <div class="text-slate-400 font-semibold text-[10px] uppercase">CO (Carbon Monoxide)</div>
+            <div id="aqi-co" class="font-bold text-sm text-slate-100">240 µg/m³</div>
+          </div>
+          <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/60">
+            <div class="text-slate-400 font-semibold text-[10px] uppercase">NO2 (Nitrogen Dioxide)</div>
+            <div id="aqi-no2" class="font-bold text-sm text-slate-100">14 µg/m³</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eco Advice Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 rounded-3xl space-y-3 border-l-4 border-emerald-500">
+          <h4 class="font-bold text-sm text-emerald-300 flex items-center gap-2">
+            <i data-lucide="leaf" class="w-4 h-4"></i> Climate Recommendation
+          </h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Local microclimate levels indicate optimal humidity and clean air. Consider using public transit or bicycling today to reduce urban carbon emissions.
+          </p>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl space-y-3 border-l-4 border-amber-500">
+          <h4 class="font-bold text-sm text-amber-300 flex items-center gap-2">
+            <i data-lucide="sun-medium" class="w-4 h-4"></i> Solar & UV Index Guide
+          </h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Moderate UV index expected during peak afternoon hours. Wear sunglasses and apply SPF 30+ sunscreen if outdoors for extended periods.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 6: SETTINGS & LANGUAGE             -->
+    <!-- ========================================== -->
+    <section id="screen-settings" class="screen-view hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-black text-white flex items-center gap-2">
+            <i data-lucide="sliders" class="w-6 h-6 text-sky-400"></i> Settings & Preferences
+          </h2>
+          <p class="text-xs text-slate-400">Configure language, temperature units, theme, and single database sync</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-6 md:p-8 rounded-3xl space-y-6 max-w-2xl">
+        <!-- Language Selector -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-sm text-slate-100">Language Preferred</div>
+            <div class="text-xs text-slate-400">AI Response natural language format</div>
+          </div>
+          <select id="setting-lang-select" class="glass-input px-3 py-2 rounded-xl text-xs font-semibold">
+            <option value="hinglish" selected>Hinglish (Hindi-English Blend)</option>
+            <option value="hindi">Hindi (हिंदी)</option>
+            <option value="english">English</option>
+            <option value="marathi">Marathi (मराठी)</option>
+            <option value="bengali">Bengali (বাংলা)</option>
+          </select>
+        </div>
+
+        <!-- Temperature Unit Switch -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div>
+            <div class="font-bold text-sm text-slate-100">Temperature Unit</div>
+            <div class="text-xs text-slate-400">Toggle Celsius (°C) / Fahrenheit (°F)</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="setting-unit-toggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+        </div>
+
+        <!-- Database Reset / Clear Actions -->
+        <div class="pt-2 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-sm text-slate-100">Database Status</div>
+            <div class="text-xs text-emerald-400 font-medium">Single DB Connected (db.json)</div>
+          </div>
+          <button onclick="alert('Chat History and Local DB Cache reset!')" class="px-4 py-2 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold hover:bg-rose-500/30 transition-all">
+            Clear Chat DB
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-2xl border-t border-slate-800 md:hidden flex items-center justify-around py-2 px-1">
+    <a href="#" data-screen="dashboard" class="mobile-nav-link active flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-semibold transition-all">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Home
+    </a>
+    <a href="#" data-screen="chat" class="mobile-nav-link flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-semibold text-slate-400 transition-all">
+      <i data-lucide="bot" class="w-5 h-5 text-sky-400"></i> AI Chat
+    </a>
+    <a href="#" data-screen="forecast" class="mobile-nav-link flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-semibold text-slate-400 transition-all">
+      <i data-lucide="calendar-days" class="w-5 h-5"></i> Forecast
+    </a>
+    <a href="#" data-screen="alerts" class="mobile-nav-link flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-semibold text-slate-400 transition-all">
+      <i data-lucide="triangle-alert" class="w-5 h-5 text-amber-400"></i> Alerts
+    </a>
+    <a href="#" data-screen="climate" class="mobile-nav-link flex flex-col items-center gap-1 p-2 rounded-xl text-[10px] font-semibold text-slate-400 transition-all">
+      <i data-lucide="wind" class="w-5 h-5 text-emerald-400"></i> Climate
+    </a>
+  </nav>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/animation.js"></script>
+  <script src="js/ai-chat.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

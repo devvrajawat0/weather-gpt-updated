@@ -58,6 +58,9 @@ const POPULAR_LOCATIONS = [
   { name: "Lucknow, UP", lat: 26.8467, lon: 80.9462, keywords: ["lucknow", "lakhnau"] },
   { name: "Shimla, HP", lat: 31.1048, lon: 77.1734, keywords: ["shimla", "simla"] },
   { name: "Jaipur, Rajasthan", lat: 26.9124, lon: 75.7873, keywords: ["jaipur"] },
+  { name: "Bhopal, MP", lat: 23.2599, lon: 77.4126, keywords: ["bhopal"] },
+  { name: "Indore, MP", lat: 22.7196, lon: 75.8577, keywords: ["indore"] },
+  { name: "Chandigarh, India", lat: 30.7333, lon: 76.7794, keywords: ["chandigarh"] },
   { name: "Bangalore, Karnataka", lat: 12.9716, lon: 77.5946, keywords: ["bangalore", "bengaluru"] },
   { name: "Pune, Maharashtra", lat: 18.5204, lon: 73.8567, keywords: ["pune", "poona"] },
   { name: "Patna, Bihar", lat: 25.5941, lon: 85.1376, keywords: ["patna"] },
@@ -65,9 +68,12 @@ const POPULAR_LOCATIONS = [
   { name: "Chennai, Tamil Nadu", lat: 13.0827, lon: 80.2707, keywords: ["chennai", "madras"] },
   { name: "Hyderabad, Telangana", lat: 17.3850, lon: 78.4867, keywords: ["hyderabad"] },
   { name: "Ahmedabad, Gujarat", lat: 23.0225, lon: 72.5714, keywords: ["ahmedabad"] },
+  { name: "Surat, Gujarat", lat: 21.1702, lon: 72.8311, keywords: ["surat"] },
   { name: "Goa, India", lat: 15.2993, lon: 74.1240, keywords: ["goa"] },
   { name: "Dehradun, Uttarakhand", lat: 30.3165, lon: 78.0322, keywords: ["dehradun"] },
   { name: "Varanasi, UP", lat: 25.3176, lon: 82.9739, keywords: ["varanasi", "banaras", "kashi"] },
+  { name: "Agra, UP", lat: 27.1767, lon: 78.0081, keywords: ["agra"] },
+  { name: "Srinagar, J&K", lat: 34.0837, lon: 74.7973, keywords: ["srinagar"] },
   { name: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, keywords: ["tokyo"] },
   { name: "London, UK", lat: 51.5074, lon: -0.1278, keywords: ["london"] },
   { name: "New York, USA", lat: 40.7128, lon: -74.0060, keywords: ["new york", "nyc"] },
@@ -77,13 +83,21 @@ const POPULAR_LOCATIONS = [
 
 // Smart Location Extractor from User Question
 async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
-  const q = (userQuery || '').toLowerCase();
+  const q = (userQuery || '').toLowerCase().trim();
   const db = readDB();
 
   let targetLocation = null;
 
-  // 1. Check local DB savedLocations
-  if (db.savedLocations && db.savedLocations.length > 0) {
+  // 1. Check popular locations dictionary first
+  for (let item of POPULAR_LOCATIONS) {
+    if (item.keywords.some(kw => q.includes(kw))) {
+      targetLocation = { name: item.name, lat: item.lat, lon: item.lon };
+      break;
+    }
+  }
+
+  // 2. Check local DB savedLocations
+  if (!targetLocation && db.savedLocations && db.savedLocations.length > 0) {
     for (let loc of db.savedLocations) {
       const nameClean = loc.name.toLowerCase();
       const firstWord = nameClean.split(',')[0].trim();
@@ -94,32 +108,27 @@ async function extractLocationAndFetchWeather(userQuery, defaultContext = {}) {
     }
   }
 
-  // 2. Check popular locations dictionary
-  if (!targetLocation) {
-    for (let item of POPULAR_LOCATIONS) {
-      if (item.keywords.some(kw => q.includes(kw))) {
-        targetLocation = { name: item.name, lat: item.lat, lon: item.lon };
-        break;
-      }
-    }
-  }
-
   // 3. Search via Open-Meteo Geocoding API if unknown city mentioned
   if (!targetLocation) {
-    // Extract capitalized words or words after 'in', 'me', 'at', 'near', 'ka', 'ki'
+    const stopWords = ["weather", "temperature", "temp", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "warning", "weekend", "hindi", "batao", "bataoo", "mein", "ka", "ki", "ko", "par", "se", "umbrella", "chhata", "hawa", "climate", "haalat", "report", "please", "should", "carry"];
+    
+    // Extract location after preposition or clean words list
     const match = q.match(/(?:in|me|at|near|ka|ki|for)\s+([a-z\s]+)/i);
-    let searchWord = match ? match[1].trim().split(' ')[0] : null;
+    let candidateWord = null;
 
-    if (!searchWord) {
-      // Try searching for any word with length >= 4 that is not a common weather keyword
-      const stopWords = ["weather", "temperature", "baarish", "barish", "rain", "today", "tomorrow", "kaisa", "hogi", "kya", "alert", "weekend", "hindi", "umbrella", "chhata", "hawa", "climate", "haalat"];
-      const words = q.split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
-      searchWord = words.find(w => w.length >= 4 && !stopWords.includes(w));
+    if (match) {
+      const words = match[1].trim().split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
+      candidateWord = words.find(w => w.length >= 3 && !stopWords.includes(w));
     }
 
-    if (searchWord && searchWord.length >= 3) {
+    if (!candidateWord) {
+      const words = q.split(/\s+/).map(w => w.replace(/[^a-z]/g, ''));
+      candidateWord = words.find(w => w.length >= 3 && !stopWords.includes(w));
+    }
+
+    if (candidateWord && candidateWord.length >= 3) {
       try {
-        const geoData = await fetchHttps(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchWord)}&count=1&language=en&format=json`);
+        const geoData = await fetchHttps(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(candidateWord)}&count=1&language=en&format=json`);
         if (geoData.results && geoData.results.length > 0) {
           const place = geoData.results[0];
           const placeName = `${place.name}${place.admin1 ? ', ' + place.admin1 : ''}${place.country ? ', ' + place.country : ''}`;
